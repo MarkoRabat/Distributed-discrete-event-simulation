@@ -19,18 +19,23 @@ public class PoolThread extends Thread {
 	
 	@Override
 	final public void run() {
-		try (Socket client = this.client;
-			BufferedReader pin = new BufferedReader(
-				new InputStreamReader(client.getInputStream())); 
-			PrintWriter outp = new PrintWriter(
-				new OutputStreamWriter(client.getOutputStream()), true);) {
-			System.out.println("The Client "
-				+ client.getInetAddress() + ":"
-				+ client.getPort() + " connected.");
-			work(pin, outp);
-		} catch (IOException e) { System.out.println("Hi from here! -- PoolThread"); }
+		work();
 	}
 
-	protected void work(BufferedReader pin, PrintWriter outp) {}
+	protected void work() {
+		try (Socket client = this.client;
+			PrintWriter outp = new PrintWriter(
+				new OutputStreamWriter(client.getOutputStream()), true);
+			BufferedReader pin = new BufferedReader(
+				new InputStreamReader(client.getInputStream()));
+		) {
+			System.out.println("The Client " + client.getInetAddress()
+				+ ":" + client.getPort() + " connected.");
+			process_request(pin, outp); outp.flush();
+			System.out.println("Connection processing end.");
+		} catch(Exception e) { e.printStackTrace(); }
+	}
+	
+	protected void process_request(BufferedReader pin, PrintWriter outp) throws Exception {}
 
 }
