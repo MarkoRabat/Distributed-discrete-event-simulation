@@ -12,15 +12,10 @@ import java.net.Socket;
 public class PoolThread extends Thread {
 
 	protected Socket client;
+	public PoolThread(Socket client) { this.client = client; }
 
-	public PoolThread(Socket client) {
-			this.client = client;
-	}
-	
 	@Override
-	final public void run() {
-		work();
-	}
+	final public void run() { work(); }
 
 	protected void work() {
 		try (Socket client = this.client;
@@ -31,8 +26,8 @@ public class PoolThread extends Thread {
 		) {
 			process_connection_start(client.getInetAddress().toString(), client.getPort());
 			String request = collect_request(pin);
-
-			String[] response = process_request(request); outp.flush();
+			String[] response = null;
+			if (!request.equals(" ")) response = process_request(request);
 			return_respone(response, outp);
 			process_connection_end(client.getInetAddress().toString(), client.getPort());
 
@@ -45,7 +40,10 @@ public class PoolThread extends Thread {
 	protected String collect_request(BufferedReader pin) throws Exception {
 		for (int i = 0; i < 30 && !pin.ready(); ++i) Thread.sleep(100);
 		StringBuilder response = new StringBuilder();
-		while (pin.ready()) response.append(pin.readLine());
+		while (pin.ready()) {
+			if (!response.toString().equals("")) response.append(" ");
+			response.append(pin.readLine());
+		}
 		return response.toString();
 	}
 	protected String[] process_request(String request) throws Exception { return null; }

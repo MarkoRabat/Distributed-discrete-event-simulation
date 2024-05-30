@@ -3,6 +3,7 @@ package commServer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public abstract class Server implements Runnable {
 
@@ -29,9 +30,7 @@ public abstract class Server implements Runnable {
 			}
 		} catch (Exception ex) {
 			//ex.printStackTrace();
-		} finally {
-			close();
-		}
+		} finally { close(); }
 	}
 
 	public abstract void processRequest(Socket client);
@@ -49,10 +48,7 @@ public abstract class Server implements Runnable {
 	}
 
 	public void stop() {
-		running = false;
-		thread.interrupt();
-		close();
-	}
+		running = false; thread.interrupt(); close(); }
 
 	public void close() {
 		try {
@@ -61,12 +57,14 @@ public abstract class Server implements Runnable {
 			e.printStackTrace();
 		}
 	}
-
-	public boolean isRunning() {
-		return running;
+	
+	public static void waitForUserConsoleQ() {
+		Scanner input = new Scanner(System.in);
+		String cont = input.nextLine();
+		while(!cont.equals("q")) cont = input.nextLine();
 	}
 
-	public static synchronized int nextId() {
-		return id++;
-	}
+	public boolean isRunning() { return running; }
+
+	public static synchronized int nextId() { return id++; }
 }
