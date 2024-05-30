@@ -13,18 +13,11 @@ public class PoolServerThread extends PoolThread {
 
 	public PoolServerThread(Socket client) { super(client); }
 	
-	protected void process_request(BufferedReader pin, PrintWriter outp) throws Exception {
-		
-		for (int i = 0; i < 20 && !pin.ready(); ++i) Thread.sleep(100);
-		
-		while (pin.ready()) System.out.println(pin.readLine()); 
-		System.out.println("Done reading request.");
-		
-		outp.println("HTTP/1.1 200 OK");
-		outp.println("Content-Type: text/html");
-		outp.println("\r\n");
-		outp.println("<h1>Hello World!</h1>");
-
+	protected String[] process_request(String request) throws Exception {
+		System.out.println(request);
+		String[] response = new String[1];
+		response[0] = "<h1>Hello World!</h1>";
+		return response;
 	}
 
 }
