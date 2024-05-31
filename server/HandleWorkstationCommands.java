@@ -12,7 +12,8 @@ public class HandleWorkstationCommands {
 	) {
 		if (commands.length != 6
 			|| !commands[2].equals("NAvailThreads")
-			|| !commands[4].equals("ServerPort")) return null;
+			|| !commands[4].equals("WorkerPort")) return null;
+
 		int workerPort = -1, availThreads = -1;
 		try { workerPort = Integer.parseInt(commands[5]);
 			availThreads = Integer.parseInt(commands[3]);
@@ -23,6 +24,10 @@ public class HandleWorkstationCommands {
 		workerAccounts.put(
 			newWorkerId, new WorkerAccount(workerIp, workerPort, availThreads));
 		rwLockWorkerAccounts.writeLock().unlock();
+
+		String[] toLog = CommandLogger.mergeLoggerCommands(commands, new String[] {"WorkerIp", workerIp, "WorkerId", "" + newWorkerId});
+		CommandLogger.logToConsole("addWorker", toLog);
+
 		return new String[] { "WorkerId", "" + newWorkerId };
 	}
 

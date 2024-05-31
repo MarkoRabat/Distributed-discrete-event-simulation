@@ -25,7 +25,7 @@ public class Server {
 		while (keys.hasMoreElements()) {
 			int key = keys.nextElement();
 			System.out.println(
-					keys.nextElement() + ": " + workerAccounts.get(key));
+					key + ": " + workerAccounts.get(key));
 		}
 
 		rwLockWorkerAccounts.readLock().unlock();
@@ -36,7 +36,7 @@ public class Server {
 		while (keys.hasMoreElements()) {
 			int key = keys.nextElement();
 			System.out.println(
-					keys.nextElement() + ": " + workerAccounts.get(key));
+					key + ": " + workerAccounts.get(key));
 		}
 
 		rwLockWorkerAccounts.readLock().unlock();

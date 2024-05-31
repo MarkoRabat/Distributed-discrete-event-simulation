@@ -22,6 +22,14 @@ public class CommClient {
 		catch (Exception e) { e.printStackTrace(); }
 		return null;
 	}
+	
+	public static String[] processResponse(String request) {
+		String[] r = request.split("\n");
+		String[] result = new String[r.length - 5];
+		for (int i = 0; i < r.length; ++i) r[i] = r[i].strip();
+		int i = 0; for (int j = 4; j < r.length - 1; result[i++] = r[j++]);
+		return result;
+	}
 
 	public static String makeWebRequest(String url) { 
 		try { return makeRequest(url, 80, new String[] {"GET / HTTP/1.0\r\n\r\n"}); }

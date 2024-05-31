@@ -23,7 +23,7 @@ public class WorkerAccount {
 		this.availThreads = availThreads;
 	}
 	
-	public static int getNextWorkerId() { return currWorkerId + 1; }
+	public static int getNextWorkerId() { return currWorkerId; }
 	
 	@Override
     public String toString() {

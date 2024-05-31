@@ -39,7 +39,6 @@ public class PoolServerThread extends PoolThread {
 	}
 	
 	protected String[] handleWorkstationClient(String[] commands, String workerIp) {
-		System.out.println("handleWorkstationClient");
 		switch (commands[1]) {
 		case "WorkstationStarted":
 			return HandleWorkstationCommands.addWorker(
