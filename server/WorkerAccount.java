@@ -9,16 +9,30 @@ public class WorkerAccount {
 	public int workerId;
 	public String timeStamp = null;
 	public String ip = null;
-	public String port = null;
+	public int port = -1;
 	public Boolean tasked = null;
+	int availThreads = -1;
 	
-	public WorkerAccount(String ip, String port) {
+	public WorkerAccount(String ip, int port, int availThreads) {
 		this.workerId = currWorkerId++;
 		this.timeStamp = new SimpleDateFormat("yyyyMMddHHmmss")
 			.format(Calendar.getInstance().getTime());
 		this.ip = ip;
 		this.port = port;
 		this.tasked = false;
+		this.availThreads = availThreads;
 	}
+	
+	public static int getNextWorkerId() { return currWorkerId + 1; }
+	
+	@Override
+    public String toString() {
+        return "{id: " + workerId
+        	+ ", timeStamp: " + timeStamp
+        	+ ", ip: " + ip
+        	+ ", port: " + port
+        	+ ", tasked: " + tasked
+        	+ "}";
+    }
 
 }

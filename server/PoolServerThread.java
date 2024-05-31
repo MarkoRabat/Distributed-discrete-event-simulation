@@ -28,7 +28,7 @@ public class PoolServerThread extends PoolThread {
 	protected String[] process_request(String request) throws Exception {
 		String[] commands = request.split(" ");
 		switch (commands[0]) {
-		case "Workstation": return handleWorkstationClient(commands);
+		case "Workstation": return handleWorkstationClient(commands, this.clientIp);
 		case "User": return handleUserClient(commands);
 		default: 
 			String[] response = new String[1];
@@ -38,12 +38,12 @@ public class PoolServerThread extends PoolThread {
 
 	}
 	
-	protected String[] handleWorkstationClient(String[] commands) {
+	protected String[] handleWorkstationClient(String[] commands, String workerIp) {
 		System.out.println("handleWorkstationClient");
 		switch (commands[1]) {
 		case "WorkstationStarted":
 			return HandleWorkstationCommands.addWorker(
-				commands, workerAccounts, rwLockWorkerAccounts);
+				commands, workerIp, workerAccounts, rwLockWorkerAccounts);
 		default:
 			return null;
 		}

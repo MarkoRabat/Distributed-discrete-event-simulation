@@ -13,6 +13,8 @@ public class PoolThread extends Thread {
 
 	protected Socket client;
 	public PoolThread(Socket client) { this.client = client; }
+	protected String clientIp = null;
+	protected int clientPort = -1;
 
 	@Override
 	final public void run() { work(); }
@@ -24,18 +26,20 @@ public class PoolThread extends Thread {
 			BufferedReader pin = new BufferedReader(
 				new InputStreamReader(client.getInputStream()));
 		) {
-			process_connection_start(client.getInetAddress().toString(), client.getPort());
+			this.clientIp = client.getInetAddress().toString();
+			this.clientPort = client.getPort();
+			process_connection_start(this.clientIp, this.clientPort);
 			String request = collect_request(pin);
 			String[] response = null;
-			if (!request.equals(" ")) response = process_request(request);
+			if (!request.equals("")) response = process_request(request);
 			return_respone(response, outp);
-			process_connection_end(client.getInetAddress().toString(), client.getPort());
+			process_connection_end(this.clientIp, this.clientPort);
 
 		} catch(Exception e) { e.printStackTrace(); }
 	}
 	
 	protected void process_connection_start(String clientIp, int clientPort) throws Exception {
-		System.out.println("The Client (" + client.getInetAddress() + "," + client.getPort() + ") connected.");
+		System.out.println("The Client (" + clientIp + "," + clientPort + ") connected.");
 	}
 	protected String collect_request(BufferedReader pin) throws Exception {
 		for (int i = 0; i < 30 && !pin.ready(); ++i) Thread.sleep(100);
@@ -57,7 +61,7 @@ public class PoolThread extends Thread {
 		outp.flush(); 
 	}
 	protected void process_connection_end(String clientIp, int clientPort) throws Exception {
-		System.out.println("The client (" + client.getInetAddress() + "," + client.getPort() + ") disconnected.");
+		System.out.println("The client (" + clientIp + "," + clientPort + ") disconnected.");
 	}
 
 }
