@@ -32,7 +32,7 @@ public class PoolServerThread extends PoolThread {
 		case "User": return handleUserClient(commands);
 		default: 
 			String[] response = new String[1];
-			response[0] = "<h1>Hello World!</h1>";
+			response[0] = "<h1>Succesful connection to Server</h1>";
 			return response;
 		}
 

@@ -3,6 +3,8 @@ package worker;
 import java.net.ConnectException;
 
 import commClient.CommClient;
+import commServer.ExecutorServer;
+import commServer.Server;
 
 public class Worker {
 	
@@ -13,11 +15,13 @@ public class Worker {
 	private static int nextAvailPort = 5001;
 	private int port;
 	private int id;
+	private ExecutorServer server = null;
 	
 	public Worker(String serverHost, int serverPort) {
 		this.serverHost = serverHost;
 		this.serverPort = serverPort;
 		this.port = nextAvailPort++;
+		server = new ExecutorServer(this.port, new PoolWorkerThreadFactory());
 	}
 
 	public Worker(String serverHost) { this(serverHost, defaultServerPort); }
@@ -31,8 +35,6 @@ public class Worker {
 				String response = CommClient.makeRequest(this.serverHost, this.serverPort, new String[] {
 					"Workstation\n", "WorkstationStarted\n", "NAvailThreads\n", "10\n", "WorkerPort\n", "" + this.port + "\n"});
 				String[] data = CommClient.processResponse(response);
-				for (int i = 0; i < data.length; ++i)
-					System.out.println(data[i] + "|");
 			}
 			catch (ConnectException e) { 
 				again = true;
@@ -42,11 +44,20 @@ public class Worker {
 			}
 		}
 	}
-
+	
+	public void serveRequests() { server.start(); }
+	public void stopRequestServer() { server.stop(); }
+	
 	public static void main(String[] args) {
-		Worker w1 = new Worker();
-		w1.connect();
-		
+		Worker[] workers = new Worker[20];
+		for (int i = 0; i < workers.length; ++i) {
+			workers[i] = new Worker();
+			workers[i].connect();
+			workers[i].serveRequests();
+		}
+		Server.waitForUserConsoleQ();
+		for (int i = 0; i < workers.length; ++i)
+			workers[i].stopRequestServer();
 	}
 
 }

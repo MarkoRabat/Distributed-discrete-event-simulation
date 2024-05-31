@@ -26,7 +26,7 @@ public class PoolThread extends Thread {
 			BufferedReader pin = new BufferedReader(
 				new InputStreamReader(client.getInputStream()));
 		) {
-			this.clientIp = client.getInetAddress().toString();
+			this.clientIp = client.getInetAddress().toString().substring(1);
 			this.clientPort = client.getPort();
 			process_connection_start(this.clientIp, this.clientPort);
 			String request = collect_request(pin);

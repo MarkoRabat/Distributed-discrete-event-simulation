@@ -12,12 +12,15 @@ public class Server {
 	private static int checkWorkerPulse = 10; // in sec
 	private static ReentrantReadWriteLock rwLockWorkerAccounts = new ReentrantReadWriteLock();
 	private static Dictionary<Integer, WorkerAccount> workerAccounts = new Hashtable<Integer, WorkerAccount>();
+	private static ChkWorkerPulseMaster pulseChk = new ChkWorkerPulseMaster(
+			checkWorkerPulse * 1000, rwLockWorkerAccounts, workerAccounts);
 	
 	public static void main(String[] args) {
 		System.out.println("Server started.");
 		ExecutorServer server = new ExecutorServer(5000,
 			new PoolServerThreadFactory(Server.workerAccounts, Server.rwLockWorkerAccounts));
 		server.start();
+		pulseChk.start();
 		server.waitForUserConsoleQ();
 		rwLockWorkerAccounts.readLock().lock();
 

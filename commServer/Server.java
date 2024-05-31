@@ -61,7 +61,10 @@ public abstract class Server implements Runnable {
 	public static void waitForUserConsoleQ() {
 		Scanner input = new Scanner(System.in);
 		String cont = input.nextLine();
-		while(!cont.equals("q")) cont = input.nextLine();
+		while(!cont.equals("q")) {
+			System.out.println(cont);
+			cont = input.nextLine();
+		}
 	}
 
 	public boolean isRunning() { return running; }

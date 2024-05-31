@@ -21,21 +21,23 @@ public class ChkWorkerPulseMaster extends Thread {
 	
 	@Override
 	public void run() {
-		try {
-	        Thread.sleep(this.pulsePeriod);
-
-	        try {
-	        	rwLockWorkerAccounts.readLock().lock();
-	        	Enumeration<Integer> keys = workerAccounts.keys();
-				while (keys.hasMoreElements()) {
-					int key = keys.nextElement();
-					new ChkWorkerPulseSlave(
-						key, workerAccounts.get(key),
-						rwLockWorkerAccounts, workerAccounts
-					).start();
+		while (true) {
+			try {
+				Thread.sleep(this.pulsePeriod);
+				try {
+					rwLockWorkerAccounts.readLock().lock();
+					Enumeration<Integer> keys = workerAccounts.keys();
+					while (keys.hasMoreElements()) {
+						int key = keys.nextElement();
+						new ChkWorkerPulseSlave(
+							key, workerAccounts.get(key).ip, 
+							workerAccounts.get(key).port,
+							rwLockWorkerAccounts, workerAccounts
+						).start();
+					}
 				}
-	        }
-	        finally { rwLockWorkerAccounts.readLock().unlock(); }
-	    } catch (InterruptedException e) { return; }
+				finally { rwLockWorkerAccounts.readLock().unlock(); }
+			} catch (InterruptedException e) { return; }
+		}
 	}
 }
