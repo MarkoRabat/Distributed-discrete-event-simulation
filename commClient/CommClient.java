@@ -32,10 +32,15 @@ public class CommClient {
 	}
 
 	public static String makeWebRequest(String url) { 
-		try { return makeRequest(url, 80, new String[] {"GET / HTTP/1.0\r\n\r\n"}); }
+		try { return makeRequest(url, 80, new String[] {"GET / HTTP/1.0\r\n\r"}); }
 		catch (Exception e) { e.getStackTrace(); } return null;
 	}
 	public static void printResponseFromGoogle() { System.out.println(makeWebRequest("www.google.com")); }
 	public static void printResponseFromYahoo() { System.out.println(makeWebRequest("www.yahoo.com")); }
+
+	public static String makeUserRequest(String host, int port, String[] params) throws ConnectException {
+		for (int i = 0; i < params.length; params[i++] += "\n");
+		return makeRequest(host, port, params);
+	}
 
 }

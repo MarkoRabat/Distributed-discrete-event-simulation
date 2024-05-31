@@ -35,15 +35,13 @@ public class ChkWorkerPulseSlave extends Thread {
 			String response = CommClient.makeRequest(
 				this.workerToChkIp, this.workerToChkPort, new String[] {"Server\n", "PulseChk\n"});
 			String[] processedResponse = CommClient.processResponse(response);
-			for (int i = 0; i < processedResponse.length; ++i) {
-				System.out.print("\t" + processedResponse[i]);
-			}
+			if (!processedResponse[0].equals("Worker") || !processedResponse[1].equals("Alive"))
+				throw new ConnectException("Invalid response");
 		} catch (ConnectException e) {
-			System.out.print("\t worker not alive pstart");
 			rwLockWorkerAccounts.writeLock().lock();
+			System.err.println("\tWorker " + workerAccounts.get(this.workerAccountKey).toString() + " down.");
 			workerAccounts.remove(this.workerAccountKey);
 			rwLockWorkerAccounts.writeLock().unlock();
-			System.out.print("\t worker not alive pend");
 		}
 	}
 

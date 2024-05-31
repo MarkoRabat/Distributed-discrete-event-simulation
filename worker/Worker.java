@@ -32,8 +32,8 @@ public class Worker {
 		while (again) {
 			again = false;
 			try {
-				String response = CommClient.makeRequest(this.serverHost, this.serverPort, new String[] {
-					"Workstation\n", "WorkstationStarted\n", "NAvailThreads\n", "10\n", "WorkerPort\n", "" + this.port + "\n"});
+				String response = CommClient.makeUserRequest(this.serverHost, this.serverPort, new String[] {
+					"Workstation", "WorkstationStarted", "NAvailThreads", "10", "WorkerPort", "" + this.port});
 				String[] data = CommClient.processResponse(response);
 			}
 			catch (ConnectException e) { 
@@ -49,12 +49,22 @@ public class Worker {
 	public void stopRequestServer() { server.stop(); }
 	
 	public static void main(String[] args) {
-		Worker[] workers = new Worker[20];
+		Worker[] workers = new Worker[5];
 		for (int i = 0; i < workers.length; ++i) {
 			workers[i] = new Worker();
 			workers[i].connect();
 			workers[i].serveRequests();
 		}
+		Server.waitForUserConsoleQ();
+		for (int i = 0; i < workers.length; ++i)
+			workers[i].stopRequestServer();
+
+		for (int i = 0; i < workers.length; ++i) {
+			workers[i] = new Worker();
+			workers[i].connect();
+			workers[i].serveRequests();
+		}
+
 		Server.waitForUserConsoleQ();
 		for (int i = 0; i < workers.length; ++i)
 			workers[i].stopRequestServer();
