@@ -10,7 +10,6 @@ public class WorkerAccount {
 	public String timeStamp = null;
 	public String ip = null;
 	public int port = -1;
-	public Boolean tasked = null;
 	int availThreads = -1;
 	
 	public WorkerAccount(String ip, int port, int availThreads) {
@@ -19,7 +18,6 @@ public class WorkerAccount {
 			.format(Calendar.getInstance().getTime());
 		this.ip = ip;
 		this.port = port;
-		this.tasked = false;
 		this.availThreads = availThreads;
 	}
 	
@@ -32,7 +30,6 @@ public class WorkerAccount {
         	+ ", ip: " + ip
         	+ ", port: " + port
         	+ ", avail_threads" + availThreads
-        	+ ", tasked: " + tasked
         	+ "}";
     }
 

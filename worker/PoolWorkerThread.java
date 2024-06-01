@@ -22,6 +22,10 @@ public class PoolWorkerThread extends PoolThread {
 		this.rwLockJobAccount = rwLockJobAccount;
 	}
 	
+	
+	protected void process_connection_start(String clientIp, int clientPort) {}
+	protected void process_connection_end(String clientIp, int clientPort) throws Exception {}
+	
 	protected String[] process_request(String[] commands) {
 		switch(commands[0]) {
 		case "Server": return handleServerClient(commands, this.clientIp);

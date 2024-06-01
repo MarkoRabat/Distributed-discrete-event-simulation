@@ -22,9 +22,10 @@ public class HandleServerCommands {
 		String simulationType = commands[7];
 		int logicalEndTime = Integer.parseInt(commands[9]);
 		int jobId = Integer.parseInt(commands[11]);
+		int subJobId = Integer.parseInt(commands[13]);
 		
 		rwLockJobAccount.writeLock().lock();
-		JobAccount jb = new JobAccount(userIp, simulationType, logicalEndTime, components, connections);
+		JobAccount jb = new JobAccount("" + subJobId, simulationType, logicalEndTime, components, connections);
 		jb.jobId = jobId;
 		jobAccount.put(jobId, jb);
 		rwLockJobAccount.writeLock().unlock();

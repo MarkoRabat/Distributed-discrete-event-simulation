@@ -2,6 +2,7 @@ package worker;
 
 import java.net.ConnectException;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import server.JobAccount;
@@ -75,9 +76,26 @@ public class Worker {
 			workers[i].serveRequests();
 		}
 
-		Server.waitForUserConsoleQ();
-		for (int i = 0; i < workers.length; ++i)
-			workers[i].stopRequestServer();
+		
+		
+		while (true) {
+			Server.waitForUserConsoleQ();
+			for (int i = 0; i < workers.length; ++i) {
+				System.out.println("============ worker[" + i + "] jobs==============");;
+				Enumeration<Integer> keys = workers[i].jobAccount.keys();
+				while (keys.hasMoreElements()) {
+					int key = keys.nextElement();
+					System.out.println(
+							key + ": " + workers[i].jobAccount.get(key));
+				}
+			}
+		}
+		
+		
+		
+		
+		//for (int i = 0; i < workers.length; ++i)
+			//workers[i].stopRequestServer();
 	}
 
 }

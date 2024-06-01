@@ -10,7 +10,7 @@ import commServer.ExecutorServer;
 public class Server {
 	
 	private static int checkWorkerPulse = 10; // in sec
-	private static int jobSchedulerPeriod = 3;
+	private static int jobSchedulerPeriod = 10;
 	private static int jobSchedulerPhase = 0;
 	private static ReentrantReadWriteLock rwLockWorkerAccounts = new ReentrantReadWriteLock();
 	private static Dictionary<Integer, WorkerAccount> workerAccounts = new Hashtable<Integer, WorkerAccount>();
@@ -50,30 +50,32 @@ public class Server {
 		}
 
 		rwLockWorkerAccounts.readLock().unlock();
-		server.waitForUserConsoleQ();
-		rwLockWorkerAccounts.readLock().lock();
+		while (true) {
+			server.waitForUserConsoleQ();
+			rwLockWorkerAccounts.readLock().lock();
 
-		System.out.println("===============workers:================");
-		keys = workerAccounts.keys();
-		while (keys.hasMoreElements()) {
-			int key = keys.nextElement();
-			System.out.println(
-					key + ": " + workerAccounts.get(key));
+			System.out.println("===============workers:================");
+			keys = workerAccounts.keys();
+			while (keys.hasMoreElements()) {
+				int key = keys.nextElement();
+				System.out.println(
+						key + ": " + workerAccounts.get(key));
+			}
+			
+			System.out.println("===============jobs:================");
+			keys = jobAccount.keys();
+			while (keys.hasMoreElements()) {
+				int key = keys.nextElement();
+				System.out.println(
+						key + ": " + jobAccount.get(key));
+			}
+
+			rwLockWorkerAccounts.readLock().unlock();
 		}
-		
-		System.out.println("===============jobs:================");
-		keys = jobAccount.keys();
-		while (keys.hasMoreElements()) {
-			int key = keys.nextElement();
-			System.out.println(
-					key + ": " + jobAccount.get(key));
-		}
 
-		rwLockWorkerAccounts.readLock().unlock();
-
-		server.stop();
-		pulseChk.interrupt();
-		jobScheduler.interrupt();
+		//server.stop();
+		//pulseChk.interrupt();
+		//jobScheduler.interrupt();
 	}
 
 }

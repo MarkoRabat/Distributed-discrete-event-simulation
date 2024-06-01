@@ -42,7 +42,7 @@ public class ChkWorkerPulseSlave extends Thread {
 			System.err.println("\tWorker " + workerAccounts.get(this.workerAccountKey).toString() + " down.");
 			workerAccounts.remove(this.workerAccountKey);
 			rwLockWorkerAccounts.writeLock().unlock();
-		}
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 
 }

@@ -38,8 +38,10 @@ public class JobScheduler extends Thread {
 				Enumeration<Integer> keys = jobAccount.keys();
 				while (keys.hasMoreElements()) {
 					int key = keys.nextElement();
-					if (jobAccount.get(key).status.equals("Ready"))
+					if (jobAccount.get(key).status.equals("Ready")) {
+						System.out.println("key: " + key);
 						new ReadyJobSlave(key, workerAccounts, rwLockWorkerAccounts, jobAccount, rwLockJobAccount).start();
+					}
 					if (jobAccount.get(key).status.equals("Failed"))
 						new FailedJobSlave(key, jobAccount, rwLockJobAccount).start();
 					if (jobAccount.get(key).status.equals("Aborted"))
