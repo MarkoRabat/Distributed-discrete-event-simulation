@@ -64,11 +64,9 @@ public class PoolThread extends Thread {
 			boolean fileMode = false; int fileChunksRem = -1;
 			String inputLine = null;
 			while ((inputLine = pin.readLine()) != null) {
-				//System.out.println("\t" + inputLine + "=EndOfRequest: " + inputLine.equals("EndOfRequest"));
 				if (inputLine.equals("EndOfRequest")) break;
+				if(inputLine.equals("GET / HTTP/1.1")) { response.append("Browser"); break; }
 				if (!response.toString().equals("") && !fileMode) response.append("&&");
-				//String inputLine = pin.readLine();
-
 				if (inputLine.equals("File") && !fileMode) { fileMode = true; continue; }
 				if (fileMode && fileChunksRem == -1) {
 					fileChunksRem = Integer.parseInt(inputLine); continue; }

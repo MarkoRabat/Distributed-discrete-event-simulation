@@ -89,15 +89,8 @@ public class User {
 		
 		String components = CommClient.loadFile("src/komponente20-5000.txt");
 		String connections = CommClient.loadFile("src/veze20-5000.txt");
-		
-		/*CommClient.printLoadedFile(components);
-		System.out.println("=============================");
-		CommClient.printLoadedFile(connections);*/
 
 		String[] result = CommClient.putFileInRequestParams(null, components);
-		//for (int i = 0; i < result.length; ++i)
-			//System.out.println(result[i]);
-		//CommClient.printLoadedFile(components);
 		user1.testConnection();
 		user1.sendJob(components, connections);
 		user1.userSleep5sByServerRq();
