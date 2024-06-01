@@ -17,7 +17,8 @@ public class PoolServerThreadFactory extends PoolThreadFactory {
 		Dictionary<Integer, WorkerAccount> workerAccounts,
 		ReentrantReadWriteLock rwLockWorkerAccounts,
 		Dictionary<Integer, JobAccount> jobAccount,
-		ReentrantReadWriteLock rwLockJobAccount) { 
+		ReentrantReadWriteLock rwLockJobAccount
+	) { 
 		super();
 		this.workerAccounts = workerAccounts;
 		this.rwLockWorkerAccounts = rwLockWorkerAccounts;

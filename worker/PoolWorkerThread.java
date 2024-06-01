@@ -1,15 +1,30 @@
 package worker;
 
 import java.net.Socket;
+import java.util.Dictionary;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import commServer.PoolThread;
+import server.JobAccount;
+import server.WorkerAccount;
 
 public class PoolWorkerThread extends PoolThread {
-	public PoolWorkerThread(Socket client) { super(client); }
+	
+	Dictionary<Integer,JobAccount> jobAccount = null;
+	ReentrantReadWriteLock rwLockJobAccount = null;
+	
+	public PoolWorkerThread(Socket client,
+		Dictionary<Integer,JobAccount> jobAccount,
+		ReentrantReadWriteLock rwLockJobAccount
+	) { 
+		super(client);
+		this.jobAccount = jobAccount;
+		this.rwLockJobAccount = rwLockJobAccount;
+	}
 	
 	protected String[] process_request(String[] commands) {
 		switch(commands[0]) {
-		case "Server": return handleServerClient(commands);
+		case "Server": return handleServerClient(commands, this.clientIp);
 		default:
 			String[] response = new String[1];
 			response[0] = "<h1>Succesful connection to Worker</h1>";
@@ -17,10 +32,13 @@ public class PoolWorkerThread extends PoolThread {
 		}
 	}
 	
-	protected String[] handleServerClient(String[] commands) {
+	protected String[] handleServerClient(String[] commands, String userIp) {
 		switch (commands[1]) {
 		case "PulseChk":
 			return HandleServerCommands.checkPulse(commands);
+		case "CreateJob":
+			return HandleServerCommands.createJob(
+				commands, userIp, this.jobAccount, this.rwLockJobAccount);
 		default:
 			return null;
 		}

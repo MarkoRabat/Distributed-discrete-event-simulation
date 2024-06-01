@@ -26,6 +26,8 @@ public class FailedJobSlave extends Thread {
 		rwLockJobAccount.writeLock().lock();
 
 		JobAccount myJobAcc = jobAccount.get(key);
+		myJobAcc.jobId = JobAccount.getNextJobId();
+		JobAccount.intJobId();
 		myJobAcc.status = "Ready";
 		myJobAcc.execIps = null;
 		myJobAcc.execPorts = null;

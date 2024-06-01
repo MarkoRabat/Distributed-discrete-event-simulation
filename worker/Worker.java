@@ -1,6 +1,10 @@
 package worker;
 
 import java.net.ConnectException;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import server.JobAccount;
 
 import commClient.CommClient;
 import commServer.ExecutorServer;
@@ -16,12 +20,18 @@ public class Worker {
 	private int port;
 	private int id;
 	private ExecutorServer server = null;
+	private ReentrantReadWriteLock rwLockJobAccount = null;
+	private Dictionary<Integer, JobAccount> jobAccount = null;
 	
 	public Worker(String serverHost, int serverPort) {
 		this.serverHost = serverHost;
 		this.serverPort = serverPort;
 		this.port = nextAvailPort++;
-		server = new ExecutorServer(this.port, new PoolWorkerThreadFactory());
+		this.rwLockJobAccount = new ReentrantReadWriteLock();
+		this.jobAccount = new Hashtable<Integer, JobAccount>();
+		this.server = new ExecutorServer(this.port, new PoolWorkerThreadFactory(
+			this.jobAccount, this.rwLockJobAccount
+		));
 	}
 
 	public Worker(String serverHost) { this(serverHost, defaultServerPort); }

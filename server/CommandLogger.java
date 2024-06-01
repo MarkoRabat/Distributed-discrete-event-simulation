@@ -2,7 +2,7 @@ package server;
 
 public class CommandLogger {
 	
-	protected static String[] mergeLoggerCommands(String[] commands1, String[] commands2) {
+	public static String[] mergeLoggerCommands(String[] commands1, String[] commands2) {
 		if (commands1 == null || commands2 == null) return null;
 		int size = commands1.length + commands2.length;
 		String[] result = new String[size];
@@ -12,7 +12,7 @@ public class CommandLogger {
 		return result;
 	}
 	
-	protected static void logToConsole(String logText, String[] command) {
+	public static void logToConsole(String logText, String[] command) {
 		System.out.print("\t" + logText + ":");
 		if (command == null) return;
 		for (int i = 0; i < command.length; System.out.print(" " + command[i++]));

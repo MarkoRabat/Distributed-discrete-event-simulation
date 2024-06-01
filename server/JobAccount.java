@@ -18,6 +18,7 @@ public class JobAccount {
 	public String connections = null;
 	public int componentsFs = -1;
 	public int connectionsFs = -1;
+	public boolean returnedToUser = false;
 	
 	public JobAccount(
 		String ip, String requestedSimType, int logicalEndTime,
@@ -37,6 +38,7 @@ public class JobAccount {
 	}
 
 	public static int getNextJobId() { return nextJobId; }
+	public static void intJobId() { ++nextJobId; }
 	
 	@Override
 	public String toString() {
