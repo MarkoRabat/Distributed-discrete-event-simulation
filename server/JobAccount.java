@@ -10,7 +10,8 @@ public class JobAccount {
 	public String finishedAt = null;
 	public String ip = null;
 	public String status = null;
-	public String executorIp = null;
+	public String[] execIps = null;
+	public int[] execPorts = null;
 	public String requestedSimType = null;
 	public int logicalEndTime = -1;
 	public String components = null;
@@ -39,17 +40,31 @@ public class JobAccount {
 	
 	@Override
 	public String toString() {
-		return "{id: " + jobId
+		String repr = "{id: " + jobId
 			+ ", startedAt: " + startedAt
 			+ ", finishedAt: " + finishedAt
 			+ ", ip: " + ip
-			+ ", status: " + status
-			+ ", execIp: " + executorIp
-			+ ", reqSimtype: " + requestedSimType
+			+ ", status: " + status;
+		
+		repr += ", execIps: ";
+		if (execIps == null) repr += execIps;
+		else { repr += "{";
+			for (int i = 0; i < execIps.length; repr += execIps[i++] + ", "); repr += "}";
+		}
+
+		repr += ", execPorts: ";
+		if (execPorts == null) repr += execPorts;
+		else { repr += "{";
+			for (int i = 0; i < execPorts.length; repr += execPorts[i++] + ", "); repr += "}";
+		}
+		
+		repr += ", reqSimtype: " + requestedSimType
 			+ ", lendTime: " + logicalEndTime
 			+ ", compFs: " + componentsFs + "B"
 			+ ", connFs: " + connectionsFs + "B"
 			+ "}";
+		
+		return repr;
 	}
 
 }

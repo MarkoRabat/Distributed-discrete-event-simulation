@@ -10,12 +10,16 @@ import commServer.ExecutorServer;
 public class Server {
 	
 	private static int checkWorkerPulse = 10; // in sec
+	private static int jobSchedulerPeriod = 3;
+	private static int jobSchedulerPhase = 0;
 	private static ReentrantReadWriteLock rwLockWorkerAccounts = new ReentrantReadWriteLock();
 	private static Dictionary<Integer, WorkerAccount> workerAccounts = new Hashtable<Integer, WorkerAccount>();
 	private static ChkWorkerPulseMaster pulseChk = new ChkWorkerPulseMaster(
 			checkWorkerPulse * 1000, rwLockWorkerAccounts, workerAccounts);
 	private static ReentrantReadWriteLock rwLockJobAccount = new ReentrantReadWriteLock();
 	private static Dictionary<Integer,JobAccount> jobAccount = new Hashtable<Integer, JobAccount>();
+	private static JobScheduler jobScheduler = new JobScheduler(
+			jobSchedulerPeriod * 1000, jobSchedulerPhase * 1000, workerAccounts, rwLockWorkerAccounts, jobAccount, rwLockJobAccount);
 	
 	public static void main(String[] args) {
 		System.out.println("Server started.");
@@ -26,6 +30,7 @@ public class Server {
 			));
 		server.start();
 		pulseChk.start();
+		jobScheduler.start();
 		server.waitForUserConsoleQ();
 		rwLockWorkerAccounts.readLock().lock();
 
@@ -68,6 +73,7 @@ public class Server {
 
 		server.stop();
 		pulseChk.interrupt();
+		jobScheduler.interrupt();
 	}
 
 }
