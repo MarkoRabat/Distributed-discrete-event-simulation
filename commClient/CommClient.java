@@ -13,6 +13,7 @@ public class CommClient {
 			OutputStream os = clientSocket.getOutputStream();
 			InputStream is = clientSocket.getInputStream();
 		) {
+			params = mergeParams(params, new String[] {"EndOfRequest\n"});
 			for (int i = 0; i < params.length; os.write(params[i++].getBytes()));
 			os.flush();
 			StringBuilder response = new StringBuilder(); int ch;
@@ -50,7 +51,7 @@ public class CommClient {
 			loadedFile = scanner.useDelimiter("\\A").next();
 		} catch (FileNotFoundException e) { e.printStackTrace(); }
 		loadedFile = loadedFile.replaceAll("[^a-zA-Z0-9 .\n]+", "");
-		loadedFile = loadedFile.replaceAll("[\n]+", "||");
+		loadedFile = loadedFile.replaceAll("[\n]", "||");
 		return loadedFile;
 	}
 	

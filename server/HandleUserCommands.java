@@ -5,10 +5,10 @@ public class HandleUserCommands {
 	public static String[] testConnection(String[] commands) { 
 		return new String[] {"TestConnect:", "Succes"};
 	}
-	
+
 	public static String[] startJob(String[] commands) {
 		
-		System.out.println("Commands:");
+		System.out.println("Commands[ " + commands.length + "]:");
 		for (int i = 0; i < commands.length; ++i)
 			System.out.println(commands[i]);
 		System.out.println("========================");
@@ -20,5 +20,12 @@ public class HandleUserCommands {
 		
 		return new String[] {"StartJob", "Job", "Started"};
 	}
+	
+	 public static String[] userBlock5s(String[] commands) {
+		 try { Thread.sleep(5000);
+		} catch (InterruptedException e) { e.printStackTrace(); }
+		 return new String[] {"UserBlock5s", "TimeElapsed"};
+	 }
+
 
 }

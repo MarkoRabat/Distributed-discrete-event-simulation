@@ -51,6 +51,8 @@ public class PoolServerThread extends PoolThread {
 		switch(commands[1]) {
 		case "TestConnect":
 			return HandleUserCommands.testConnection(commands);
+		case "UserBlock5s":
+			return HandleUserCommands.userBlock5s(commands);
 		case "StartJob":
 			return HandleUserCommands.startJob(commands);
 		default:

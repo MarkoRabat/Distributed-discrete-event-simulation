@@ -42,6 +42,26 @@ public class User {
 			}
 		}
 	}
+	
+	public void userSleep5sByServerRq() {
+		for (int attempts = 3; attempts > 0; --attempts) {
+			try {
+				String response = CommClient.makeUserRequest(
+					this.serverHost, this.serverPort, new String[] { "User", "UserBlock5s"});
+				String[] data = CommClient.processResponse(response);
+				System.out.print("attempt[" + (3 - attempts) + "]:\t");
+				for (int i = 0; i < data.length; ++i)
+					System.out.print(" " + data[i]);
+				System.out.println();
+				attempts = 0;
+			}
+			catch (ConnectException e) { 
+				try { Thread.sleep(200); }
+				catch (InterruptedException e1) { e1.printStackTrace(); }
+				System.err.println("Server not reachable: retrying...");
+			}
+		}
+	}
 
 	public void sendJob(String components, String connections) {
 		for (int attempts = 3; attempts > 0; --attempts) {
@@ -63,7 +83,7 @@ public class User {
 			}
 		}
 	}
-		
+	
 	public static void main(String[] args) {
 		User user1 = new User();
 		
@@ -75,11 +95,12 @@ public class User {
 		CommClient.printLoadedFile(connections);*/
 
 		String[] result = CommClient.putFileInRequestParams(null, components);
-		for (int i = 0; i < result.length; ++i)
-			System.out.println(result[i]);
+		//for (int i = 0; i < result.length; ++i)
+			//System.out.println(result[i]);
 		//CommClient.printLoadedFile(components);
 		user1.testConnection();
 		user1.sendJob(components, connections);
+		user1.userSleep5sByServerRq();
 	}
 
 }
