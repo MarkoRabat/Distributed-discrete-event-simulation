@@ -7,8 +7,7 @@ import commServer.PoolThread;
 public class PoolWorkerThread extends PoolThread {
 	public PoolWorkerThread(Socket client) { super(client); }
 	
-	protected String[] process_request(String request) {
-		String[] commands = request.split(" ");
+	protected String[] process_request(String[] commands) {
 		switch(commands[0]) {
 		case "Server": return handleServerClient(commands);
 		default:

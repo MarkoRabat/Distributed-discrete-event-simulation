@@ -25,8 +25,7 @@ public class PoolServerThread extends PoolThread {
 		this.rwLockWorkerAccounts = rwLockWorkerAccounts;
 	}
 	
-	protected String[] process_request(String request) throws Exception {
-		String[] commands = request.split(" ");
+	protected String[] process_request(String[] commands) throws Exception {
 		switch (commands[0]) {
 		case "Workstation": return handleWorkstationClient(commands, this.clientIp);
 		case "User": return handleUserClient(commands);
@@ -49,7 +48,14 @@ public class PoolServerThread extends PoolThread {
 	}
 	
 	protected String[] handleUserClient(String[] commands) {
-		return null;
+		switch(commands[1]) {
+		case "TestConnect":
+			return HandleUserCommands.testConnection(commands);
+		case "StartJob":
+			return HandleUserCommands.startJob(commands);
+		default:
+			return null;
+		}
 	}
 	
 }

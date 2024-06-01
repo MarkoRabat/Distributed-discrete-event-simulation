@@ -44,6 +44,7 @@ public class Server {
 
 		rwLockWorkerAccounts.readLock().unlock();
 		server.stop();
+		pulseChk.interrupt();
 	}
 
 }
