@@ -19,12 +19,16 @@ public class FailedJobSlave extends Thread {
 	
 	@Override
 	public void run() {
-		// create AbortedJobSlave
+		AbortedJobSlave myJob = new AbortedJobSlave(key, jobAccount, rwLockJobAccount);
+		myJob.start();
+		try { myJob.join(); } catch (InterruptedException e) { e.printStackTrace(); }
 		
 		rwLockJobAccount.writeLock().lock();
-	
-		// update this job to Ready
-		// update workers to null
+
+		JobAccount myJobAcc = jobAccount.get(key);
+		myJobAcc.status = "Ready";
+		myJobAcc.execIps = null;
+		myJobAcc.execPorts = null;
 
 		rwLockJobAccount.writeLock().unlock();
 	}
