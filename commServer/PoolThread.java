@@ -70,8 +70,8 @@ public class PoolThread extends Thread {
 				if (inputLine.equals("File") && !fileMode) { fileMode = true; continue; }
 				if (fileMode && fileChunksRem == -1) {
 					fileChunksRem = Integer.parseInt(inputLine); continue; }
-				else if (fileMode && fileChunksRem > 0) --fileChunksRem;
-				else if (fileMode && fileChunksRem == 0) {
+				else if (fileMode && fileChunksRem > 1) --fileChunksRem;
+				else if (fileMode && fileChunksRem <= 1) {
 					fileMode = false; fileChunksRem = -1; }
 				response.append(inputLine);
 			}

@@ -7,17 +7,10 @@ public class HandleUserCommands {
 	}
 
 	public static String[] startJob(String[] commands) {
-		
-		System.out.println("Commands[ " + commands.length + "]:");
-		for (int i = 0; i < commands.length; ++i)
-			System.out.println(commands[i]);
-		System.out.println("========================");
-		
-		/*System.out.println("Components file: ");
-		System.out.println(commands[4]);
-		System.out.println("Connections file: ");
-		System.out.println(commands[6]);*/
-		
+
+		String components = commands[3];
+		String connections = commands[5];
+
 		return new String[] {"StartJob", "Job", "Started"};
 	}
 	

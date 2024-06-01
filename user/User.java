@@ -70,6 +70,7 @@ public class User {
 				params = CommClient.putFileInRequestParams(params, components);
 				params = CommClient.mergeParams(params, new String[] { "Connections", "File"});
 				params = CommClient.putFileInRequestParams(params, connections);
+				System.out.println(params[params.length - 4]);
 				String response = CommClient.makeUserRequest(this.serverHost, this.serverPort, params);
 				String[] data = CommClient.processResponse(response);
 				for (int i = 0; i < data.length; ++i)
@@ -93,7 +94,7 @@ public class User {
 		String[] result = CommClient.putFileInRequestParams(null, components);
 		user1.testConnection();
 		user1.sendJob(components, connections);
-		user1.userSleep5sByServerRq();
+		//user1.userSleep5sByServerRq();
 	}
 
 }
