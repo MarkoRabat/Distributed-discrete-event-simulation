@@ -5,7 +5,7 @@ import java.util.Calendar;
 
 public class WorkerAccount {
 
-	private static int currWorkerId = 0;
+	private static int nextWorkerId = 0;
 	public int workerId;
 	public String timeStamp = null;
 	public String ip = null;
@@ -14,7 +14,7 @@ public class WorkerAccount {
 	int availThreads = -1;
 	
 	public WorkerAccount(String ip, int port, int availThreads) {
-		this.workerId = currWorkerId++;
+		this.workerId = nextWorkerId++;
 		this.timeStamp = new SimpleDateFormat("yyyyMMddHHmmss")
 			.format(Calendar.getInstance().getTime());
 		this.ip = ip;
@@ -23,7 +23,7 @@ public class WorkerAccount {
 		this.availThreads = availThreads;
 	}
 	
-	public static int getNextWorkerId() { return currWorkerId; }
+	public static int getNextWorkerId() { return nextWorkerId; }
 	
 	@Override
     public String toString() {
@@ -31,6 +31,7 @@ public class WorkerAccount {
         	+ ", timeStamp: " + timeStamp
         	+ ", ip: " + ip
         	+ ", port: " + port
+        	+ ", avail_threads" + availThreads
         	+ ", tasked: " + tasked
         	+ "}";
     }

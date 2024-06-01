@@ -16,19 +16,26 @@ public class PoolServerThread extends PoolThread {
 	
 	private Dictionary<Integer, WorkerAccount> workerAccounts = null;
 	private ReentrantReadWriteLock rwLockWorkerAccounts = null;
+	Dictionary<Integer,JobAccount> jobAccount = null;
+	ReentrantReadWriteLock rwLockJobAccount = null;
 
 	public PoolServerThread(Socket client,
 		Dictionary<Integer, WorkerAccount> workerAccounts,
-		ReentrantReadWriteLock rwLockWorkerAccounts) { 
+		ReentrantReadWriteLock rwLockWorkerAccounts,
+		Dictionary<Integer,JobAccount> jobAccount,
+		ReentrantReadWriteLock rwLockJobAccount
+	) { 
 		super(client);
 		this.workerAccounts = workerAccounts;
 		this.rwLockWorkerAccounts = rwLockWorkerAccounts;
+		this.jobAccount = jobAccount;
+		this.rwLockJobAccount = rwLockJobAccount;
 	}
 	
 	protected String[] process_request(String[] commands) throws Exception {
 		switch (commands[0]) {
 		case "Workstation": return handleWorkstationClient(commands, this.clientIp);
-		case "User": return handleUserClient(commands);
+		case "User": return handleUserClient(commands, this.clientIp);
 		default: 
 			String[] response = new String[1];
 			response[0] = "<h1>Succesful connection to Server</h1>";
@@ -47,14 +54,15 @@ public class PoolServerThread extends PoolThread {
 		}
 	}
 	
-	protected String[] handleUserClient(String[] commands) {
+	protected String[] handleUserClient(String[] commands, String userIp) {
 		switch(commands[1]) {
 		case "TestConnect":
 			return HandleUserCommands.testConnection(commands);
 		case "UserBlock5s":
 			return HandleUserCommands.userBlock5s(commands);
 		case "StartJob":
-			return HandleUserCommands.startJob(commands);
+			return HandleUserCommands.startJob(
+				commands, userIp, jobAccount, rwLockJobAccount);
 		default:
 			return null;
 		}
