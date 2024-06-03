@@ -12,6 +12,8 @@ public class PoolWorkerThread extends PoolThread {
 	
 	Dictionary<Integer,JobAccount> jobAccount = null;
 	ReentrantReadWriteLock rwLockJobAccount = null;
+	Dictionary<Integer,JExecutor> jExecutorAccount = null;
+	ReentrantReadWriteLock rwLockJExecutorAccount = null;
 	int serverAvailThreads = -1;
 	String workerIp = "localhost";
 	int workerPort = -1;
@@ -19,6 +21,8 @@ public class PoolWorkerThread extends PoolThread {
 	public PoolWorkerThread(Socket client,
 		Dictionary<Integer,JobAccount> jobAccount,
 		ReentrantReadWriteLock rwLockJobAccount,
+		Dictionary<Integer,JExecutor> jExecutorAccount,
+		ReentrantReadWriteLock rwLockJExecutorAccount,
 		int serverAvailThreads, String workerIp, int workerPort
 	) { 
 		super(client);
@@ -27,6 +31,8 @@ public class PoolWorkerThread extends PoolThread {
 		this.serverAvailThreads = serverAvailThreads;
 		this.workerIp = workerIp;
 		this.workerPort = workerPort;
+		this.jExecutorAccount = jExecutorAccount;
+		this.rwLockJExecutorAccount = rwLockJExecutorAccount;
 	}
 	
 	

@@ -17,6 +17,8 @@ public class Worker {
 	private static final String defaultServerHost = "localhost";
 	private static final int defaultAvailThreads = 10;
 	private static final String defaultWorkerIp = "localhost";
+	private static int jobSchedulerPeriod = 10;
+	private static int jobSchedulerPhase = 0;
 	private String serverHost;
 	private int serverPort;
 	private static int nextAvailPort = 5001;
@@ -24,6 +26,9 @@ public class Worker {
 	private ExecutorServer server = null;
 	private ReentrantReadWriteLock rwLockJobAccount = null;
 	private Dictionary<Integer, JobAccount> jobAccount = null;
+	private ReentrantReadWriteLock rwLockJExecutorAccount = null;
+	private Dictionary<Integer, JExecutor> jExecutorAccount = null;
+	private JobScheduler jobScheduler = null;
 	private int availThreads = -1;
 	
 	public Worker(String serverHost, int serverPort, int availThreads) {
@@ -32,10 +37,16 @@ public class Worker {
 		this.port = nextAvailPort++;
 		this.rwLockJobAccount = new ReentrantReadWriteLock();
 		this.jobAccount = new Hashtable<Integer, JobAccount>();
+		this.rwLockJExecutorAccount = new ReentrantReadWriteLock();
+		this.jExecutorAccount = new Hashtable<Integer, JExecutor>();
 		this.availThreads = availThreads;
 		this.server = new ExecutorServer(this.port, new PoolWorkerThreadFactory(
-			this.jobAccount, this.rwLockJobAccount, this.availThreads, defaultWorkerIp, port
+			this.jobAccount, this.rwLockJobAccount, 
+			jExecutorAccount, rwLockJExecutorAccount, 
+			this.availThreads, defaultWorkerIp, port
 		));
+		this.jobScheduler = new JobScheduler(
+			jobSchedulerPeriod * 1000, jobSchedulerPhase * 1000, jobAccount, rwLockJobAccount, jExecutorAccount, rwLockJExecutorAccount);
 	}
 
 	public Worker(String serverHost, int availThreads) { this(serverHost, defaultServerPort, availThreads); }
@@ -65,8 +76,8 @@ public class Worker {
 	
 		//-- in both cases server should increase avail thread count by one
 
-	public void serveRequests() { server.start(); }
-	public void stopRequestServer() { server.stop(); }
+	public void serveRequests() { server.start(); jobScheduler.start(); }
+	public void stopRequestServer() { server.stop(); jobScheduler.interrupt(); }
 	
 	public static void main(String[] args) {
 		Worker[] workers = new Worker[5];
@@ -99,9 +110,6 @@ public class Worker {
 				}
 			}
 		}
-		
-		
-		
 		
 		//for (int i = 0; i < workers.length; ++i)
 			//workers[i].stopRequestServer();
