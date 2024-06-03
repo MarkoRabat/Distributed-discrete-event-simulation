@@ -38,6 +38,8 @@ public class ReadyJobSlave extends Thread {
 		String connections = null;
 		String jobName = null;
 		int jobid = -1;
+		String simType = null;
+		int ltime = -1;
 		
 		rwLockWorkerAccounts.readLock().lock();
 		Enumeration<Integer> keys = workerAccounts.keys();
@@ -89,6 +91,8 @@ public class ReadyJobSlave extends Thread {
 			components = jb.components;
 			connections = jb.connections;
 			jobName = jb.name;
+			simType = jb.requestedSimType;
+			ltime = jb.logicalEndTime;
 		
 		rwLockWorkerAccounts.readLock().unlock();
 		rwLockJobAccount.writeLock().unlock();
@@ -102,7 +106,7 @@ public class ReadyJobSlave extends Thread {
 			}*/
 			requestThreads[j] = new SendJobToWorkerSlave(
 				jobid, j % workerCnt, workerIps[j], workerPorts[j],
-				components, connections, jobName
+				components, connections, jobName, simType, ltime
 			);
 		}
 		

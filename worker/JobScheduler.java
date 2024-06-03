@@ -43,7 +43,8 @@ public class JobScheduler extends Thread {
 					int key = keys.nextElement();
 					if (jobAccount.get(key).status.equals("Ready")) {
 						jobAccount.get(key).status = "Executing";
-						JExecutor jexec = new JExecutor(key, jobAccount, rwLockJobAccount);
+						int subkey = Integer.parseInt(jobAccount.get(key).ip);
+						JExecutor jexec = new JExecutor(key, subkey, jobAccount, rwLockJobAccount);
 						this.jExecutorAccount.put(key, jexec); jexec.start();
 					}
 				}

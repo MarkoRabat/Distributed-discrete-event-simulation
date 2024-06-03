@@ -64,7 +64,7 @@ public class User {
 		}
 	}
 
-	public void sendJob(String jobName, String components, String connections) {
+	public void sendJob(String jobName, String components, String connections, String simType, int ltime) {
 		for (int attempts = 3; attempts > 0; --attempts) {
 			try {
 				String[] params = new String[] {"User", "StartJob", "Components", "File"};
@@ -72,7 +72,7 @@ public class User {
 				params = CommClient.mergeParams(params, new String[] { "Connections", "File"});
 				params = CommClient.putFileInRequestParams(params, connections);
 				params = CommClient.mergeParams(params, new String[] {
-					"SimulationType", "SomeSimType", "logicalEndTime", "10", "JobName", jobName});
+					"SimulationType", simType, "logicalEndTime", "" + ltime, "JobName", jobName});
 				String response = CommClient.makeUserRequest(this.serverHost, this.serverPort, params);
 				String[] data = CommClient.processResponse(response);
 				for (int i = 0; i < data.length; ++i)
@@ -153,9 +153,8 @@ public class User {
 
 		String[] result = CommClient.putFileInRequestParams(null, components);
 		user1.testConnection();
-		user1.sendJob("job1", components, connections);
-		user1.sendJob("job2", components, connections);
-		user1.sendJob("job3", components, connections);
+		for (int i = 0; i < 3; ++i)
+			user1.sendJob("job" + i, components, connections, "SimulatorSinglethread", 100);
 		Server.waitForUserConsoleQ();
 		
 		Scanner input = new Scanner(System.in);

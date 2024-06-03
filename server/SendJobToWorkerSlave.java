@@ -11,10 +11,13 @@ public class SendJobToWorkerSlave extends Thread {
 	String components = null;
 	String connections = null;
 	String jobName = null;
+	String simType = null;
+	int ltime = -1;
 	
 	public SendJobToWorkerSlave(
 		int jobId, int subJobId, String wip, int wport,
-		String components, String connections, String jobName
+		String components, String connections,
+		String jobName, String simType, int ltime
 	) {
 		this.jobId = jobId;
 		this.subJobId = subJobId;
@@ -23,6 +26,8 @@ public class SendJobToWorkerSlave extends Thread {
 		this.components = components;
 		this.connections = connections;
 		this.jobName = jobName;
+		this.simType = simType;
+		this.ltime = ltime;
 	}
 	
 	@Override
@@ -32,7 +37,7 @@ public class SendJobToWorkerSlave extends Thread {
 		params = CommClient.mergeParams(params, new String[] { "Connections", "File"});
 		params = CommClient.putFileInRequestParams(params, connections);
 		params = CommClient.mergeParams(params, new String[] {
-			"SimulationType", "SomeSimType", "logicalEndTime", "10"});
+			"SimulationType", simType, "logicalEndTime", "" + ltime});
 		params = CommClient.mergeParams(params, new String[] {
 			"jobId", "" + this.jobId, "subJobId", "" + this.subJobId,
 			"JobName", jobName, "AbortJob", "0"});
