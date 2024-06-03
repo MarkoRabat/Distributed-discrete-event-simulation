@@ -107,14 +107,33 @@ public class User {
 		}
 	}
 	
-	public void infoJob(int jobId) {
+	public void infoJobStatus(int jobId) {
 		for (int attempts = 3; attempts > 0; --attempts) {
 			try {
-				String[] params = new String[] {"User", "InfoJob", "JobId", "" + jobId};
+				String[] params = new String[] {"User", "InfoJobStatus", "JobId", "" + jobId};
 				String response = CommClient.makeUserRequest(this.serverHost, this.serverPort, params);
 				String[] data = CommClient.processResponse(response);
 				for (int i = 0; i < data.length; ++i)
 					System.out.print(" " + data[i]);
+				System.out.println();
+				attempts = 0;
+			}
+			catch (ConnectException e) { 
+				try { Thread.sleep(200); }
+				catch (InterruptedException e1) { e1.printStackTrace(); }
+				System.err.println("Server not reachable: retrying...");
+			}
+		}
+	}
+	
+	public void listJobs() {
+		for (int attempts = 3; attempts > 0; --attempts) {
+			try {
+				String[] params = new String[] {"User", "ListJobs"};
+				String response = CommClient.makeUserRequest(this.serverHost, this.serverPort, params);
+				String[] data = CommClient.processResponse(response);
+				for (int i = 0; i < data.length; ++i)
+					System.out.println(" " + data[i]);
 				System.out.println();
 				attempts = 0;
 			}
@@ -144,7 +163,8 @@ public class User {
 			int jid = Integer.parseInt(input.nextLine());
 			user1.abortJob(jid);
 			int jid2 = Integer.parseInt(input.nextLine());
-			user1.infoJob(jid2);
+			user1.infoJobStatus(jid2);
+			user1.listJobs();
 		}
 		
 		//user1.userSleep5sByServerRq();

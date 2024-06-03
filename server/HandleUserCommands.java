@@ -96,13 +96,38 @@ public class HandleUserCommands {
 			
 			JobAccount jb = jobAccount.get(jobId);
 			if (jb == null) { rwLockJobAccount.readLock().unlock();
-				return new String[] {"Server", "InfoJob", "NoJob", "Failed"}; }
+				return new String[] {"Server", "InfoJobStatus", "NoJob", "Failed"}; }
 			status = jb.status;
 			
 		rwLockJobAccount.readLock().unlock();
 		if (status.startsWith("__")) status = status.substring(2);
 		
-		return new String[] {"Servere", "InfoJob", status, "Success"};
+		return new String[] {"Server", "InfoJob", status, "Success"};
+	}
+
+	public static String[] listJobs(String[] commands,
+		Dictionary<Integer, JobAccount> jobAccount,
+		ReentrantReadWriteLock rwLockJobAccount) {
+		
+		String[] result = null;
+		int jobCnt = 0;
+		
+		rwLockJobAccount.readLock().lock();
+		
+		Enumeration<Integer> keys = jobAccount.keys();
+		while (keys.hasMoreElements()) {
+			int key = keys.nextElement(); ++jobCnt; }
+		
+		result = new String[jobCnt + 2];
+		result[0] = "Server"; result[1] = "ListJobs";
+
+		jobCnt = 2;
+		keys = jobAccount.keys();
+		while (keys.hasMoreElements())
+			result[jobCnt++] = jobAccount.get(keys.nextElement()).toString();
+		
+		rwLockJobAccount.readLock().unlock();
+		return result;
 	}
 			
 
