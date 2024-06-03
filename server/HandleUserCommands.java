@@ -24,8 +24,6 @@ public class HandleUserCommands {
 		int logicalEndTime = Integer.parseInt(commands[9]);
 		String jobName = commands[11];
 		
-		System.out.println(components);
-		
 		int jobId = -1;
 		rwLockJobAccount.writeLock().lock();
 		jobId = JobAccount.getNextJobId();

@@ -51,11 +51,9 @@ public class HandleServerCommands {
 			
 			String[] toLog = new String[] {
 				commands[0], commands[1], "userIp", 
-				userIp, "status", "Aborted", commands[6],
-				commands[7], commands[8], commands[9],
+				userIp, "status", "Aborted", 
 				"jobId", "" + (-1), commands[12],
 				commands[13], commands[14], commands[15],
-				commands[16], commands[17]
 			};
 			CommandLogger.logToConsole("startJob", toLog);
 			return new String[] {"StartJob", "Job", "Aborted", "Id", "" + (-1)};
@@ -82,18 +80,16 @@ public class HandleServerCommands {
 		
 		String[] toLog = new String[] {
 			commands[0], commands[1], "userIp", 
-			userIp, "status", "Ready", commands[6],
-			commands[7], commands[8], commands[9],
-			"jobId", "" + jobId, commands[12],
-			commands[13], commands[14], commands[15],
-			commands[16], commands[17]
-		}; CommandLogger.logToConsole("startJob", toLog); System.out.println();
+			userIp, "status", "Ready", "jobId",
+			"" + jobId, commands[12], commands[13],
+			commands[14], commands[15]
+		}; CommandLogger.logToConsole("startJob", toLog);
 
 		return new String[] {"StartJob", "Job", "Ready", "Id", "" + jobId};
 
 	}
 
-	public static String[] abortJob(
+	public static String[] abortJob( // this can happen when one of the workers stops responding
 		String selfIp, int selfPort, String[] commands, String userIp, 
 		Dictionary<Integer,JobAccount> jobAccount,
 		ReentrantReadWriteLock rwLockJobAccount,
@@ -106,7 +102,7 @@ public class HandleServerCommands {
 		String[] toLog = new String[] {
 			commands[0], commands[1], commands[2],
 			commands[3], "userIp", userIp };
-		CommandLogger.logToConsole("startJob", toLog); System.out.println();
+		CommandLogger.logToConsole("abortJob", toLog);
 
 		rwLockJobAccount.writeLock().lock();
 		
@@ -150,19 +146,11 @@ public class HandleServerCommands {
 					int jeKey = jeKeys.nextElement();
 					if(jExecutorAccount.get(jeKey).getKey() / availThreads == jobId
 						&& jExecutorAccount.get(jeKey).isAlive())
-						jExecutorAccount.get(jeKey).interrupt();
+						jExecutorAccount.get(jeKey).terminate();
 				}
 			rwLockJExecutorAccount.writeLock().unlock();
 		}
-		
-		
-
 
 		return new String[] { "Abort", "Success" };
-
-
-		
 	}
-	
-
 }

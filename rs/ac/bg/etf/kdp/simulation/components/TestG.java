@@ -14,8 +14,7 @@ public class TestG {
 			String connections = args[1];
 			String componentsDst = args[2];
 			Netlist<Object> netlist = loadNetlist(components, connections);
-			//Simulator<Object> simulator = new SimulatorSinglethread<Object>(1);
-			//Simulator<Object> simulator = new SimulatorMultithread<Object>(1);
+			// Simulator<Object> simulator = new SimulatorSinglethread<Object>(1);
 			Simulator<Object> simulator = new SimulatorOptimistic<Object>(1);
 
 			simulator.setNetlist(netlist);

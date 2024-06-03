@@ -1,5 +1,6 @@
 package worker;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -21,6 +22,7 @@ public class JExecutor extends Thread {
 	private int subkey;
 	private Dictionary<Integer,JobAccount> jobAccount = null;
 	private ReentrantReadWriteLock rwLockJobAccount = null;
+	private boolean requestedTermination = false;
 	
 	public JExecutor (int key, int subkey,
 		Dictionary<Integer,JobAccount> jobAccount,
@@ -33,12 +35,11 @@ public class JExecutor extends Thread {
 	}
 	
 	public int getKey() { return key; }
+	public void terminate() { requestedTermination = true; }
 	
 	@Override
 	public void run() {
 		try {
-			
-			
 			String components = null;
 			String connections = null;
 			String rst = null;
@@ -46,14 +47,13 @@ public class JExecutor extends Thread {
 
 			rwLockJobAccount.readLock().lock();
 			
-			
-
-			rwLockJobAccount.readLock().unlock();
-			
 				components = jobAccount.get(key).components;
 				connections = jobAccount.get(key).connections;
 				rst = jobAccount.get(key).requestedSimType;
 				ltime = jobAccount.get(key).logicalEndTime;
+
+			rwLockJobAccount.readLock().unlock();
+			
 			
 			Netlist<Object> netlist = createNetlist(components, connections);
 			
@@ -72,20 +72,18 @@ public class JExecutor extends Thread {
 			
 			simulator.setNetlist(netlist);
 			simulator.init();
-			while (simulator.getlTime() < ltime) {
+			while (simulator.getlTime() < ltime && !requestedTermination) {
 				simulator.execute();
 				//System.out.println("Time{" + key + "}: " + simulator.getlTime());
 			}
+			if (requestedTermination) {
+				System.err.println("\tExecutor for the job " + key + " has been terminated."); return; }
 			System.out.println("==================================================");
 			System.out.println("WORKER FINISHED");
 			System.out.println("==================================================");
-			System.out.println(netlisttoStr(netlist, "\n"));
-			System.out.println("==================================================");
-		}
-		catch (InterruptedException e) {
-			System.err.println("\tExecutor for the job " + key + " killed.");
-			// send aborted notification
-			return;
+			try (PrintWriter out = new PrintWriter("job_" + key + "_" + subkey + ".txt")) {
+			    out.println(netlisttoStr(netlist, "\n"));
+			}
 		}
 		catch (Exception e) {
 			// error in conf, abort whole job somehow
