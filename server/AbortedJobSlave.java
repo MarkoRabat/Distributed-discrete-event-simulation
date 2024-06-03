@@ -45,12 +45,8 @@ public class AbortedJobSlave extends Thread {
 			return;
 		}
 		
-		if (myJobAccount.status.equals("Aborted")) {
+		if (myJobAccount.status.equals("Aborted"))
 			myJobAccount.status = "__Abotred";
-			myJobAccount.finishedAt = new SimpleDateFormat("yyyyMMddHHmmss")
-				.format(Calendar.getInstance().getTime());
-		}
-		
 		
 		execIps = myJobAccount.execIps;
 		execPorts = myJobAccount.execPorts;

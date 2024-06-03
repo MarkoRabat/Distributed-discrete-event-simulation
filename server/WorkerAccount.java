@@ -29,7 +29,7 @@ public class WorkerAccount {
         	+ ", timeStamp: " + timeStamp
         	+ ", ip: " + ip
         	+ ", port: " + port
-        	+ ", avail_threads" + availThreads
+        	+ ", avail_threads: " + availThreads
         	+ "}";
     }
 

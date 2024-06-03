@@ -54,41 +54,41 @@ public class ReadyJobSlave extends Thread {
 		rwLockWorkerAccounts.readLock().lock();
 		rwLockJobAccount.writeLock().lock();
 		
-		JobAccount jb = jobAccount.get(this.key);
-		if (!jb.status.equals("Ready")) {
-			rwLockWorkerAccounts.readLock().unlock();
-			rwLockJobAccount.writeLock().unlock();
-			return;
-		}
-		
-		int i = 0;
-		keys = workerAccounts.keys();
-		while (keys.hasMoreElements() && i < workerCnt) {
-			int key = keys.nextElement(); 
-			WorkerAccount wa = workerAccounts.get(key);
-			workerIps[i] = wa.ip;
-			workerPorts[i] = wa.port;
-			availThreads[i] = wa.availThreads;
-			++i;
-		}
-		
-		if (i < workerCnt) {
-			rwLockWorkerAccounts.readLock().unlock();
-			rwLockJobAccount.writeLock().unlock();
-			return;
-		}
-		
-		//do round robin here to lower avail
-		//thread coun't for each worker
-		
+			JobAccount jb = jobAccount.get(this.key);
+			if (!jb.status.equals("Ready")) {
+				rwLockWorkerAccounts.readLock().unlock();
+				rwLockJobAccount.writeLock().unlock();
+				return;
+			}
+			
+			int i = 0;
+			keys = workerAccounts.keys();
+			while (keys.hasMoreElements() && i < workerCnt) {
+				int key = keys.nextElement(); 
+				WorkerAccount wa = workerAccounts.get(key);
+				workerIps[i] = wa.ip;
+				workerPorts[i] = wa.port;
+				availThreads[i] = wa.availThreads;
+				++i;
+			}
+			
+			if (i < workerCnt) {
+				rwLockWorkerAccounts.readLock().unlock();
+				rwLockJobAccount.writeLock().unlock();
+				return;
+			}
+			
+			//do round robin here to lower avail
+			//thread coun't for each worker
+			
 
-		jb.execIps = workerIps;
-		jb.execPorts = workerPorts;
-		jb.status = "Scheduled";
-		jobid = jb.jobId;
-		components = jb.components;
-		connections = jb.connections;
-		jobName = jb.name;
+			jb.execIps = workerIps;
+			jb.execPorts = workerPorts;
+			jb.status = "Scheduled";
+			jobid = jb.jobId;
+			components = jb.components;
+			connections = jb.connections;
+			jobName = jb.name;
 		
 		rwLockWorkerAccounts.readLock().unlock();
 		rwLockJobAccount.writeLock().unlock();
@@ -116,13 +116,13 @@ public class ReadyJobSlave extends Thread {
 		
 		rwLockJobAccount.writeLock().lock();
 		
-		if (!jb.status.equals("Scheduled")) {
-			rwLockJobAccount.writeLock().unlock();
-			return;
-		}
-		
-		JobAccount jb2 = jobAccount.get(this.key);
-		jb2.status = "Running";
+			if (!jb.status.equals("Scheduled")) {
+				rwLockJobAccount.writeLock().unlock();
+				return;
+			}
+			
+			JobAccount jb2 = jobAccount.get(this.key);
+			jb2.status = "Running";
 		
 		rwLockJobAccount.writeLock().unlock();
 	}

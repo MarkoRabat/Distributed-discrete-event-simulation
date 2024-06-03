@@ -1,5 +1,7 @@
 package server;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -80,6 +82,8 @@ public class HandleUserCommands {
 			}
 
 			jb.status = "Aborted";
+			jb.finishedAt = new SimpleDateFormat("yyyyMMddHHmmss")
+				.format(Calendar.getInstance().getTime());
 		
 		rwLockJobAccount.writeLock().unlock();
 

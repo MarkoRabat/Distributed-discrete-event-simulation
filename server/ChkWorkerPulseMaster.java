@@ -9,14 +9,20 @@ public class ChkWorkerPulseMaster extends Thread {
 	private int pulsePeriod; // in msec
 	private Dictionary<Integer, WorkerAccount> workerAccounts;
 	private ReentrantReadWriteLock rwLockWorkerAccounts;
+	private Dictionary<Integer, JobAccount> jobAccount;
+	private ReentrantReadWriteLock rwLockJobAccount;
 	
 	public ChkWorkerPulseMaster(int pulsePeriod,
 		ReentrantReadWriteLock rwLockWorkerAccounts,
-		Dictionary<Integer, WorkerAccount> workerAccounts
+		Dictionary<Integer, WorkerAccount> workerAccounts,
+		ReentrantReadWriteLock rwLockJobAccount,
+		Dictionary<Integer, JobAccount> jobAccount
 	) {
 		this.pulsePeriod = pulsePeriod;
 		this.workerAccounts = workerAccounts;
 		this.rwLockWorkerAccounts = rwLockWorkerAccounts;
+		this.jobAccount = jobAccount;
+		this.rwLockJobAccount = rwLockJobAccount;
 	}
 	
 	@Override
@@ -32,7 +38,8 @@ public class ChkWorkerPulseMaster extends Thread {
 						new ChkWorkerPulseSlave(
 							key, workerAccounts.get(key).ip, 
 							workerAccounts.get(key).port,
-							rwLockWorkerAccounts, workerAccounts
+							rwLockWorkerAccounts, workerAccounts,
+							rwLockJobAccount, jobAccount
 						).start();
 					}
 				}

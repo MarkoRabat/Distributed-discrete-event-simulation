@@ -14,10 +14,10 @@ public class Server {
 	private static int jobSchedulerPhase = 0;
 	private static ReentrantReadWriteLock rwLockWorkerAccounts = new ReentrantReadWriteLock();
 	private static Dictionary<Integer, WorkerAccount> workerAccounts = new Hashtable<Integer, WorkerAccount>();
-	private static ChkWorkerPulseMaster pulseChk = new ChkWorkerPulseMaster(
-			checkWorkerPulse * 1000, rwLockWorkerAccounts, workerAccounts);
 	private static ReentrantReadWriteLock rwLockJobAccount = new ReentrantReadWriteLock();
 	private static Dictionary<Integer,JobAccount> jobAccount = new Hashtable<Integer, JobAccount>();
+	private static ChkWorkerPulseMaster pulseChk = new ChkWorkerPulseMaster(
+			checkWorkerPulse * 1000, rwLockWorkerAccounts, workerAccounts, rwLockJobAccount, jobAccount);
 	private static JobScheduler jobScheduler = new JobScheduler(
 			jobSchedulerPeriod * 1000, jobSchedulerPhase * 1000, workerAccounts, rwLockWorkerAccounts, jobAccount, rwLockJobAccount);
 	
