@@ -120,7 +120,12 @@ public class User {
 		user1.sendJob("job2", components, connections);
 		user1.sendJob("job3", components, connections);
 		Server.waitForUserConsoleQ();
-		user1.abortJob(0);
+		
+		Scanner input = new Scanner(System.in);
+		while (true) {
+			int jid = Integer.parseInt(input.nextLine());
+			user1.abortJob(jid);
+		}
 		
 		//user1.userSleep5sByServerRq();
 	}

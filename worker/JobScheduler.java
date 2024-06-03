@@ -37,6 +37,7 @@ public class JobScheduler extends Thread {
 			while (true) {
 				Thread.sleep(checkPeriod);
 				rwLockJobAccount.readLock().lock();
+				rwLockJExecutorAccount.writeLock().lock();
 				Enumeration<Integer> keys = jobAccount.keys();
 				while (keys.hasMoreElements()) {
 					int key = keys.nextElement();
@@ -47,10 +48,14 @@ public class JobScheduler extends Thread {
 						// same key as current jobAccount -- because it is unique
 						// when aborting in HandleServerCommands interrupt this thread
 						//	for a chosen job key is jobId == (key / serverAvailableThreads)
-						new JExecutor(key, jobAccount, rwLockJobAccount).start();
+						JExecutor jexec = new JExecutor(key, jobAccount, rwLockJobAccount);
+						this.jExecutorAccount.put(key, jexec);
+						jexec.start();
+						System.out.println("jexec started: " + jexec.isAlive());
 					}
 				}
 				rwLockJobAccount.readLock().unlock();
+				rwLockJExecutorAccount.writeLock().unlock();
 			}
 		} catch (InterruptedException e) { return; }
 	}

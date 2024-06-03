@@ -24,12 +24,16 @@ public class JExecutor extends Thread {
 		this.rwLockJobAccount = rwLockJobAccount;
 	}
 	
+	public int getKey() { return key; }
+	
 	@Override
 	public void run() {
 		try {
-		    Random rand = new Random();
-			int sleep_time = rand.nextInt(8);			
-			Thread.sleep(sleep_time * 1000);
+			while (true) {
+				Random rand = new Random();
+				int sleep_time = rand.nextInt(8);			
+				Thread.sleep(sleep_time * 1000);
+			}
 		}
 		catch (InterruptedException e) {
 			System.err.println("\tExecutor for the job " + key + " terminated.");

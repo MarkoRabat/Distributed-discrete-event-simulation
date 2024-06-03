@@ -59,8 +59,9 @@ public class PoolWorkerThread extends PoolThread {
 		case "AbortJob":
 			//* SHOULD FREE ALL THREADS THAT DO SUBJOBS OF THIS JOB AND SEND PACKETS
 			return HandleServerCommands.abortJob(
-				this.workerIp, this.workerPort, commands,
-				userIp, this.jobAccount, this.rwLockJobAccount,
+				this.workerIp, this.workerPort, commands, userIp,
+				this.jobAccount, this.rwLockJobAccount,
+				this.jExecutorAccount, this.rwLockJExecutorAccount,
 				this.serverAvailThreads
 			);
 		default:

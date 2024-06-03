@@ -17,7 +17,7 @@ public class Worker {
 	private static final String defaultServerHost = "localhost";
 	private static final int defaultAvailThreads = 10;
 	private static final String defaultWorkerIp = "localhost";
-	private static int jobSchedulerPeriod = 10;
+	private static int jobSchedulerPeriod = 3;
 	private static int jobSchedulerPhase = 0;
 	private String serverHost;
 	private int serverPort;
@@ -106,7 +106,18 @@ public class Worker {
 				while (keys.hasMoreElements()) {
 					int key = keys.nextElement();
 					System.out.println(
-							key + ": " + workers[i].jobAccount.get(key));
+						key + ": " + workers[i].jobAccount.get(key));
+				}
+
+			}
+			System.out.println();
+			for (int i = 0; i < workers.length; ++i) {
+				System.out.println("============ worker[" + i + "] executors==============");;
+				Enumeration<Integer> keys = workers[i].jExecutorAccount.keys();
+				while (keys.hasMoreElements()) {
+					int key = keys.nextElement();
+					System.out.println(
+						key + ": " + workers[i].jExecutorAccount.get(key).isAlive());
 				}
 			}
 		}

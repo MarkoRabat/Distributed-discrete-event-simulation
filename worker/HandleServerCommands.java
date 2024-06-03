@@ -94,10 +94,12 @@ public class HandleServerCommands {
 	}
 
 	public static String[] abortJob(
-		String selfIp, int selfPort, String[] commands,
-		String userIp, Dictionary<Integer,JobAccount> jobAccount,
-		ReentrantReadWriteLock rwLockJobAccount, int availThreads) {
-		
+		String selfIp, int selfPort, String[] commands, String userIp, 
+		Dictionary<Integer,JobAccount> jobAccount,
+		ReentrantReadWriteLock rwLockJobAccount,
+		Dictionary<Integer, JExecutor> jExecutorAccount,
+		ReentrantReadWriteLock rwLockJExecutorAccount, int availThreads
+	) {
 		int jobId = Integer.parseInt(commands[3]);
 
 		boolean jobFound = false;
@@ -106,12 +108,7 @@ public class HandleServerCommands {
 			commands[3], "userIp", userIp };
 		CommandLogger.logToConsole("startJob", toLog); System.out.println();
 
-		
-
 		rwLockJobAccount.writeLock().lock();
-		
-		
-		
 		
 			Enumeration<Integer> keys = jobAccount.keys();
 			while (keys.hasMoreElements()) {
@@ -122,22 +119,13 @@ public class HandleServerCommands {
 						jobAccount.get(key).finishedAt = new SimpleDateFormat("yyyyMMddHHmmss")
 							.format(Calendar.getInstance().getTime());
 						jobAccount.get(key).status = "Aborted";
-					}
-					jobFound = true;
+					} jobFound = true;
 				}
 			}
-			
-			
-		
 		rwLockJobAccount.writeLock().unlock();
 		
 		if (!jobFound) {
-			
-			// create new job with Aborted status
-			
-			
 			jobId = jobId * availThreads;
-
 			String[] params = new String[] {"Server", "CreateJob", "Components", "File"};
 			params = CommClient.putFileInRequestParams(params, "");
 			params = CommClient.mergeParams(params, new String[] { "Connections", "File"});
@@ -149,18 +137,29 @@ public class HandleServerCommands {
 				"JobName", "Unknown", "AbortJob", "1"});
 			
 			String response = null;
-			try { 
-				response = CommClient.makeUserRequest(selfIp, selfPort, params);
-				String[] data = CommClient.processResponse(response);
-			}
+			try { response = CommClient.makeUserRequest(selfIp, selfPort, params);
+				String[] data = CommClient.processResponse(response); }
 			catch (ConnectException e) { System.err.println(
 				"\tWorker(this) {ip: " + selfIp + "," + selfPort + "} not responding to abort job request."); }
 			catch (Error e) { e.printStackTrace(); }
 		}
+		else {
+			rwLockJExecutorAccount.writeLock().lock();
+				Enumeration<Integer> jeKeys = jExecutorAccount.keys();
+				while (jeKeys.hasMoreElements()) {
+					int jeKey = jeKeys.nextElement();
+					if(jExecutorAccount.get(jeKey).getKey() / availThreads == jobId
+						&& jExecutorAccount.get(jeKey).isAlive())
+						jExecutorAccount.get(jeKey).interrupt();
+				}
+			rwLockJExecutorAccount.writeLock().unlock();
+		}
+		
+		
+
 
 		return new String[] { "Abort", "Success" };
 
-		// stop threads if any are running
 
 		
 	}
