@@ -15,28 +15,31 @@ public class Worker {
 	
 	private static final int defaultServerPort = 5000;
 	private static final String defaultServerHost = "localhost";
+	private static final int defaultAvailThreads = 10;
 	private String serverHost;
 	private int serverPort;
 	private static int nextAvailPort = 5001;
 	private int port;
-	private int id;
 	private ExecutorServer server = null;
 	private ReentrantReadWriteLock rwLockJobAccount = null;
 	private Dictionary<Integer, JobAccount> jobAccount = null;
+	private int availThreads = -1;
 	
-	public Worker(String serverHost, int serverPort) {
+	public Worker(String serverHost, int serverPort, int availThreads) {
 		this.serverHost = serverHost;
 		this.serverPort = serverPort;
 		this.port = nextAvailPort++;
 		this.rwLockJobAccount = new ReentrantReadWriteLock();
 		this.jobAccount = new Hashtable<Integer, JobAccount>();
+		this.availThreads = availThreads;
 		this.server = new ExecutorServer(this.port, new PoolWorkerThreadFactory(
-			this.jobAccount, this.rwLockJobAccount
+			this.jobAccount, this.rwLockJobAccount, this.availThreads
 		));
 	}
 
-	public Worker(String serverHost) { this(serverHost, defaultServerPort); }
-	public Worker() { this(defaultServerHost, defaultServerPort); }
+	public Worker(String serverHost, int availThreads) { this(serverHost, defaultServerPort, availThreads); }
+	public Worker(String serverHost) { this(serverHost, defaultServerPort, defaultAvailThreads); }
+	public Worker() { this(defaultServerHost, defaultServerPort, defaultAvailThreads); }
 	
 	public void connect() {
 		Boolean again = true;
@@ -56,6 +59,11 @@ public class Worker {
 		}
 	}
 	
+	//* send to server that job is done
+	//* send to server that job is aborted
+	
+		//-- in both cases server should increase avail thread count by one
+
 	public void serveRequests() { server.start(); }
 	public void stopRequestServer() { server.stop(); }
 	

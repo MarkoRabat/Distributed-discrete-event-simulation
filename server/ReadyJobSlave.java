@@ -36,8 +36,8 @@ public class ReadyJobSlave extends Thread {
 		int workerCnt = 0;
 		String components = null;
 		String connections = null;
+		String jobName = null;
 		int jobid = -1;
-		
 		
 		rwLockWorkerAccounts.readLock().lock();
 		Enumeration<Integer> keys = workerAccounts.keys();
@@ -46,17 +46,24 @@ public class ReadyJobSlave extends Thread {
 		rwLockWorkerAccounts.readLock().unlock();
 		
 		if (workerCnt <= 0) return;
-		
-		rwLockWorkerAccounts.readLock().lock();
-		rwLockJobAccount.writeLock().lock();
-		
+
 		workerIps = new String[workerCnt];
 		workerPorts = new int[workerCnt];
 		availThreads = new int[workerCnt];
 		
+		rwLockWorkerAccounts.readLock().lock();
+		rwLockJobAccount.writeLock().lock();
+		
+		JobAccount jb = jobAccount.get(this.key);
+		if (!jb.status.equals("Ready")) {
+			rwLockWorkerAccounts.readLock().unlock();
+			rwLockJobAccount.writeLock().unlock();
+			return;
+		}
+		
 		int i = 0;
 		keys = workerAccounts.keys();
-		while (keys.hasMoreElements()) {
+		while (keys.hasMoreElements() && i < workerCnt) {
 			int key = keys.nextElement(); 
 			WorkerAccount wa = workerAccounts.get(key);
 			workerIps[i] = wa.ip;
@@ -64,14 +71,24 @@ public class ReadyJobSlave extends Thread {
 			availThreads[i] = wa.availThreads;
 			++i;
 		}
+		
+		if (i < workerCnt) {
+			rwLockWorkerAccounts.readLock().unlock();
+			rwLockJobAccount.writeLock().unlock();
+			return;
+		}
+		
+		//do round robin here to lower avail
+		//thread coun't for each worker
+		
 
-		JobAccount jb = jobAccount.get(this.key);
 		jb.execIps = workerIps;
 		jb.execPorts = workerPorts;
 		jb.status = "Scheduled";
 		jobid = jb.jobId;
 		components = jb.components;
 		connections = jb.connections;
+		jobName = jb.name;
 		
 		rwLockWorkerAccounts.readLock().unlock();
 		rwLockJobAccount.writeLock().unlock();
@@ -84,8 +101,8 @@ public class ReadyJobSlave extends Thread {
 				// put something smart here later
 			}*/
 			requestThreads[j] = new SendJobToWorkerSlave(
-				jobid * workerCnt + j % workerCnt, j % workerCnt, workerIps[j], workerPorts[j],
-				components, connections
+				jobid, j % workerCnt, workerIps[j], workerPorts[j],
+				components, connections, jobName
 			);
 		}
 		
@@ -98,6 +115,11 @@ public class ReadyJobSlave extends Thread {
 		
 		
 		rwLockJobAccount.writeLock().lock();
+		
+		if (!jb.status.equals("Scheduled")) {
+			rwLockJobAccount.writeLock().unlock();
+			return;
+		}
 		
 		JobAccount jb2 = jobAccount.get(this.key);
 		jb2.status = "Running";

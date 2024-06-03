@@ -12,19 +12,22 @@ public class PoolWorkerThreadFactory extends PoolThreadFactory {
 
 	Dictionary<Integer,JobAccount> jobAccount = null;
 	ReentrantReadWriteLock rwLockJobAccount = null;
+	int serverAvailThreads = -1;
 	
 	public PoolWorkerThreadFactory(
 		Dictionary<Integer, JobAccount> jobAccount,
-		ReentrantReadWriteLock rwLockJobAccount
+		ReentrantReadWriteLock rwLockJobAccount,
+		int serverAvailThreads
 	) { 
 		super();
 		this.jobAccount = jobAccount;
 		this.rwLockJobAccount = rwLockJobAccount;
+		this.serverAvailThreads = serverAvailThreads;
 	}
 	
 	public PoolWorkerThread createThreadForConn(Socket socket) {
 		return new PoolWorkerThread(
-			socket, jobAccount, rwLockJobAccount);
+			socket, jobAccount, rwLockJobAccount, serverAvailThreads);
 	}
 
 }

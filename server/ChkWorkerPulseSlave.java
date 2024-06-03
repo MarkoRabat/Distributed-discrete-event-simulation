@@ -40,6 +40,9 @@ public class ChkWorkerPulseSlave extends Thread {
 		} catch (ConnectException e) {
 			rwLockWorkerAccounts.writeLock().lock();
 			System.err.println("\tWorker " + workerAccounts.get(this.workerAccountKey).toString() + " down.");
+
+			//UPDATE JOB TO FAILED -- THIS SHOULD PROBABY BE DONE HERE	=> LOCK and all that
+
 			workerAccounts.remove(this.workerAccountKey);
 			rwLockWorkerAccounts.writeLock().unlock();
 		} catch (Exception e) { e.printStackTrace(); }

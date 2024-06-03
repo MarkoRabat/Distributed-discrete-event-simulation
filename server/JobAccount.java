@@ -19,22 +19,24 @@ public class JobAccount {
 	public int componentsFs = -1;
 	public int connectionsFs = -1;
 	public boolean returnedToUser = false;
+	public String name = null;
 	
 	public JobAccount(
 		String ip, String requestedSimType, int logicalEndTime,
-		String components, String connections
+		String components, String connections, String name, String status
 	) {
 		this.jobId = nextJobId++;
 		this.startedAt = new SimpleDateFormat("yyyyMMddHHmmss")
 			.format(Calendar.getInstance().getTime());
 		this.ip = ip;
-		this.status = "Ready";
+		this.status = status;
 		this.requestedSimType = requestedSimType;
 		this.logicalEndTime = logicalEndTime;
 		this.components = components;
 		this.connections = connections;
 		this.componentsFs = components.length();
 		this.connectionsFs = connections.length();
+		this.name = name;
 	}
 
 	public static int getNextJobId() { return nextJobId; }
@@ -43,6 +45,7 @@ public class JobAccount {
 	@Override
 	public String toString() {
 		String repr = "{id: " + jobId
+			+ ", jobName: " + name
 			+ ", startedAt: " + startedAt
 			+ ", finishedAt: " + finishedAt
 			+ ", ip: " + ip

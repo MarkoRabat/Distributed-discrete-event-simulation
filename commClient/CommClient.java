@@ -26,6 +26,7 @@ public class CommClient {
 	}
 	
 	public static String[] processResponse(String request) {
+		if (request == null) return null;
 		String[] r = request.split("\n");
 		String[] result = new String[r.length - 5];
 		for (int i = 0; i < r.length; ++i) r[i] = r[i].strip();

@@ -49,6 +49,12 @@ public class PoolServerThread extends PoolThread {
 		case "WorkstationStarted":
 			return HandleWorkstationCommands.addWorker(
 				commands, workerIp, workerAccounts, rwLockWorkerAccounts);
+		/*case "SUBJOB_DONE":
+			INCREMENT AVAIL THREADS FOR THIS WORKER BY ONE
+			return SMTH
+		case "SUBJOB_ABORTED":
+			INCREMENT AVAIL THREADS FOR THIS WORKER BY ONE
+			return SMTH*/
 		default:
 			return null;
 		}
@@ -62,7 +68,10 @@ public class PoolServerThread extends PoolThread {
 			return HandleUserCommands.userBlock5s(commands);
 		case "StartJob":
 			return HandleUserCommands.startJob(
-				commands, userIp, jobAccount, rwLockJobAccount);
+				commands, userIp, this.jobAccount, this.rwLockJobAccount);
+		case "Abort":
+			return HandleUserCommands.abort(commands, userIp,
+				this.jobAccount, this.rwLockJobAccount);
 		default:
 			return null;
 		}

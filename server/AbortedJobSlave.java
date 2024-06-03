@@ -8,26 +8,54 @@ public class AbortedJobSlave extends Thread {
 	
 	
 	private int key;
-	private Dictionary<Integer,JobAccount> jobAccount = null;
+	private Dictionary<Integer,JobAccount> jobAccounts = null;
 	private ReentrantReadWriteLock rwLockJobAccount = null;
 	
 	public AbortedJobSlave (int key,
-		Dictionary<Integer,JobAccount> jobAccount,
+		Dictionary<Integer,JobAccount> jobAccounts,
 		ReentrantReadWriteLock rwLockJobAccount
 	) {
 		this.key = key;
-		this.jobAccount = jobAccount;
+		this.jobAccounts = jobAccounts;
 		this.rwLockJobAccount = rwLockJobAccount;
 	}
 	
 	@Override
 	public void run() {
+		
+		String[] execIps = null;
+		int[] execPorts = null;
+		int jobId = -1;
 
-		rwLockJobAccount.readLock().lock();
+		rwLockJobAccount.writeLock().lock();
+		
+		JobAccount myJobAccount = jobAccounts.get(this.key);
+		
+		// many add here !ConfError
+		// add ConfError
+		if (!myJobAccount.status.equals("Aborted")
+			&& !myJobAccount.status.equals("Failed"))
+		{
+			rwLockJobAccount.writeLock().unlock();
+			return;
+		}
+		
+		if (myJobAccount.status.equals("Aborted"))
+			myJobAccount.status = "__Abotred";
+		
+		execIps = myJobAccount.execIps;
+		execPorts = myJobAccount.execPorts;
+		jobId = myJobAccount.jobId;
 	
-		// update workers of this job that it is aborted
+		rwLockJobAccount.writeLock().unlock();
 
-		rwLockJobAccount.readLock().unlock();
+		if (execIps == null) return;
+		// update workers of this job that it has been aborted
+		for (int i = 0; i < execIps.length; ++i) {
+			// create thread for each worker to alert it that this job
+			// has been aborted
+		}
+
 	}
 	
 }

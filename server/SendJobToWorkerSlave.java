@@ -10,10 +10,11 @@ public class SendJobToWorkerSlave extends Thread {
 	String wip = null;
 	String components = null;
 	String connections = null;
+	String jobName = null;
 	
 	public SendJobToWorkerSlave(
 		int jobId, int subJobId, String wip, int wport,
-		String components, String connections
+		String components, String connections, String jobName
 	) {
 		this.jobId = jobId;
 		this.subJobId = subJobId;
@@ -21,8 +22,9 @@ public class SendJobToWorkerSlave extends Thread {
 		this.wport = wport;
 		this.components = components;
 		this.connections = connections;
+		this.jobName = jobName;
 	}
-		
+	
 	@Override
 	public void run() {
 		String[] params = new String[] {"Server", "CreateJob", "Components", "File"};
@@ -32,16 +34,17 @@ public class SendJobToWorkerSlave extends Thread {
 		params = CommClient.mergeParams(params, new String[] {
 			"SimulationType", "SomeSimType", "logicalEndTime", "10"});
 		params = CommClient.mergeParams(params, new String[] {
-			"jobId", "" + this.jobId, "subJobId", "" + this.subJobId});
+			"jobId", "" + this.jobId, "subJobId", "" + this.subJobId,
+			"JobName", jobName, "AbortJob", "0"});
 		
 		String response = null;
-		try { response = CommClient.makeUserRequest(wip, wport, params); }
+		try { 
+			response = CommClient.makeUserRequest(wip, wport, params);
+			String[] data = CommClient.processResponse(response);
+		}
 		catch (ConnectException e) { System.err.println(
 			"\tWorker {ip: " + wip + "," + wport + "} not responding to start job request."); }
-		String[] data = CommClient.processResponse(response);
-		//for (int i = 0; i < data.length; ++i) System.out.print(" " + data[i]);
-		//System.out.println();
-
+		catch (Error e) { e.printStackTrace(); }
 	}
 
 }
