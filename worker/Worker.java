@@ -16,6 +16,7 @@ public class Worker {
 	private static final int defaultServerPort = 5000;
 	private static final String defaultServerHost = "localhost";
 	private static final int defaultAvailThreads = 10;
+	private static final String defaultWorkerIp = "localhost";
 	private String serverHost;
 	private int serverPort;
 	private static int nextAvailPort = 5001;
@@ -33,7 +34,7 @@ public class Worker {
 		this.jobAccount = new Hashtable<Integer, JobAccount>();
 		this.availThreads = availThreads;
 		this.server = new ExecutorServer(this.port, new PoolWorkerThreadFactory(
-			this.jobAccount, this.rwLockJobAccount, this.availThreads
+			this.jobAccount, this.rwLockJobAccount, this.availThreads, defaultWorkerIp, port
 		));
 	}
 

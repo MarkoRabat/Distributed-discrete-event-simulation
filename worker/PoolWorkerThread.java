@@ -13,16 +13,20 @@ public class PoolWorkerThread extends PoolThread {
 	Dictionary<Integer,JobAccount> jobAccount = null;
 	ReentrantReadWriteLock rwLockJobAccount = null;
 	int serverAvailThreads = -1;
+	String workerIp = "localhost";
+	int workerPort = -1;
 	
 	public PoolWorkerThread(Socket client,
 		Dictionary<Integer,JobAccount> jobAccount,
 		ReentrantReadWriteLock rwLockJobAccount,
-		int serverAvailThreads
+		int serverAvailThreads, String workerIp, int workerPort
 	) { 
 		super(client);
 		this.jobAccount = jobAccount;
 		this.rwLockJobAccount = rwLockJobAccount;
 		this.serverAvailThreads = serverAvailThreads;
+		this.workerIp = workerIp;
+		this.workerPort = workerPort;
 	}
 	
 	
@@ -47,10 +51,12 @@ public class PoolWorkerThread extends PoolThread {
 			return HandleServerCommands.createJob(
 				commands, userIp, this.jobAccount, this.rwLockJobAccount, this.serverAvailThreads);
 		case "AbortJob":
-			//* SHOULD CREATE JOB WITH ABORTED STATUS IF IT DOESN'T ALREADY EXIST
 			//* SHOULD FREE ALL THREADS THAT DO SUBJOBS OF THIS JOB AND SEND PACKETS
-
-			//return HandleServerCommands.abortJob();
+			return HandleServerCommands.abortJob(
+				this.workerIp, this.workerPort, commands,
+				userIp, this.jobAccount, this.rwLockJobAccount,
+				this.serverAvailThreads
+			);
 		default:
 			return null;
 		}

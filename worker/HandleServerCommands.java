@@ -1,9 +1,13 @@
 package worker;
 
+import java.net.ConnectException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import commClient.CommClient;
 import server.CommandLogger;
 import server.JobAccount;
 
@@ -35,7 +39,6 @@ public class HandleServerCommands {
 		Enumeration<Integer> keys = jobAccount.keys();
 			while (keys.hasMoreElements()) {
 				int key = keys.nextElement();
-				System.out.println("key: " + key);
 				if(jobAccount.get(key).jobId / availThreads == jobId
 					&& jobAccount.get(key).status.equals("Aborted"))
 				{
@@ -70,10 +73,6 @@ public class HandleServerCommands {
 			if(jobAccount.get(key).jobId / availThreads == jobId) ++subpCnt;
 		}
 		
-		System.out.println("jobId: " + jobId);
-		System.out.println("availThreads: " + availThreads);
-		System.out.println("subpCnt: " + subpCnt);
-
 		jobId = jobId * availThreads + subpCnt;
 		
 		jb.jobId = jobId;
@@ -88,11 +87,83 @@ public class HandleServerCommands {
 			"jobId", "" + jobId, commands[12],
 			commands[13], commands[14], commands[15],
 			commands[16], commands[17]
-		};
-		CommandLogger.logToConsole("startJob", toLog);
+		}; CommandLogger.logToConsole("startJob", toLog); System.out.println();
 
 		return new String[] {"StartJob", "Job", "Ready", "Id", "" + jobId};
 
 	}
+
+	public static String[] abortJob(
+		String selfIp, int selfPort, String[] commands,
+		String userIp, Dictionary<Integer,JobAccount> jobAccount,
+		ReentrantReadWriteLock rwLockJobAccount, int availThreads) {
+		
+		int jobId = Integer.parseInt(commands[3]);
+
+		boolean jobFound = false;
+		String[] toLog = new String[] {
+			commands[0], commands[1], commands[2],
+			commands[3], "userIp", userIp };
+		CommandLogger.logToConsole("startJob", toLog); System.out.println();
+
+		
+
+		rwLockJobAccount.writeLock().lock();
+		
+		
+		
+		
+			Enumeration<Integer> keys = jobAccount.keys();
+			while (keys.hasMoreElements()) {
+				int key = keys.nextElement();
+				if(jobAccount.get(key).jobId / availThreads == jobId)
+				{
+					if (!jobAccount.get(key).status.equals("Aborted")) {
+						jobAccount.get(key).finishedAt = new SimpleDateFormat("yyyyMMddHHmmss")
+							.format(Calendar.getInstance().getTime());
+						jobAccount.get(key).status = "Aborted";
+					}
+					jobFound = true;
+				}
+			}
+			
+			
+		
+		rwLockJobAccount.writeLock().unlock();
+		
+		if (!jobFound) {
+			
+			// create new job with Aborted status
+			
+			
+			jobId = jobId * availThreads;
+
+			String[] params = new String[] {"Server", "CreateJob", "Components", "File"};
+			params = CommClient.putFileInRequestParams(params, "");
+			params = CommClient.mergeParams(params, new String[] { "Connections", "File"});
+			params = CommClient.putFileInRequestParams(params, "");
+			params = CommClient.mergeParams(params, new String[] {
+				"SimulationType", "SomeSimType", "logicalEndTime", "10"});
+			params = CommClient.mergeParams(params, new String[] {
+				"jobId", "" + jobId, "subJobId", "" + 0,
+				"JobName", "Unknown", "AbortJob", "1"});
+			
+			String response = null;
+			try { 
+				response = CommClient.makeUserRequest(selfIp, selfPort, params);
+				String[] data = CommClient.processResponse(response);
+			}
+			catch (ConnectException e) { System.err.println(
+				"\tWorker(this) {ip: " + selfIp + "," + selfPort + "} not responding to abort job request."); }
+			catch (Error e) { e.printStackTrace(); }
+		}
+
+		return new String[] { "Abort", "Success" };
+
+		// stop threads if any are running
+
+		
+	}
+	
 
 }
