@@ -72,6 +72,9 @@ public class PoolServerThread extends PoolThread {
 		case "Abort":
 			return HandleUserCommands.abort(commands, userIp,
 				this.jobAccount, this.rwLockJobAccount);
+		case "InfoJob":
+			return HandleUserCommands.infoJob(
+				commands, this.jobAccount, this.rwLockJobAccount);
 		default:
 			return null;
 		}

@@ -105,7 +105,25 @@ public class User {
 				System.err.println("Server not reachable: retrying...");
 			}
 		}
-		
+	}
+	
+	public void infoJob(int jobId) {
+		for (int attempts = 3; attempts > 0; --attempts) {
+			try {
+				String[] params = new String[] {"User", "InfoJob", "JobId", "" + jobId};
+				String response = CommClient.makeUserRequest(this.serverHost, this.serverPort, params);
+				String[] data = CommClient.processResponse(response);
+				for (int i = 0; i < data.length; ++i)
+					System.out.print(" " + data[i]);
+				System.out.println();
+				attempts = 0;
+			}
+			catch (ConnectException e) { 
+				try { Thread.sleep(200); }
+				catch (InterruptedException e1) { e1.printStackTrace(); }
+				System.err.println("Server not reachable: retrying...");
+			}
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -125,6 +143,8 @@ public class User {
 		while (true) {
 			int jid = Integer.parseInt(input.nextLine());
 			user1.abortJob(jid);
+			int jid2 = Integer.parseInt(input.nextLine());
+			user1.infoJob(jid2);
 		}
 		
 		//user1.userSleep5sByServerRq();

@@ -43,15 +43,8 @@ public class JobScheduler extends Thread {
 					int key = keys.nextElement();
 					if (jobAccount.get(key).status.equals("Ready")) {
 						jobAccount.get(key).status = "Executing";
-						// put jExecutor into jExecutorAccount
-						// no need to check if current jobAccount aborted because it is Ready
-						// same key as current jobAccount -- because it is unique
-						// when aborting in HandleServerCommands interrupt this thread
-						//	for a chosen job key is jobId == (key / serverAvailableThreads)
 						JExecutor jexec = new JExecutor(key, jobAccount, rwLockJobAccount);
-						this.jExecutorAccount.put(key, jexec);
-						jexec.start();
-						System.out.println("jexec started: " + jexec.isAlive());
+						this.jExecutorAccount.put(key, jexec); jexec.start();
 					}
 				}
 				rwLockJobAccount.readLock().unlock();

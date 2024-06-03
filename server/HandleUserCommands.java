@@ -55,13 +55,8 @@ public class HandleUserCommands {
 		Dictionary<Integer,JobAccount> jobAccount,
 		ReentrantReadWriteLock rwLockJobAccount
 	) {
-		
 		int jid_to_abort = Integer.parseInt(commands[3]);
-		System.out.println("jid_to_abort");
-		System.out.println(jid_to_abort);
-		
 		rwLockJobAccount.writeLock().lock();
-		
 		
 			JobAccount jb = jobAccount.get(jid_to_abort);
 			if (jb == null) {
@@ -86,9 +81,30 @@ public class HandleUserCommands {
 				.format(Calendar.getInstance().getTime());
 		
 		rwLockJobAccount.writeLock().unlock();
-
 		return new String[] {"Abort", "Success"};
 	}
+	
+	
+	public static String[] infoJob(String[] commands,
+			Dictionary<Integer,JobAccount> jobAccount,
+		ReentrantReadWriteLock rwLockJobAccount) {
+		
+		String status = null;
+		int jobId = Integer.parseInt(commands[3]);
+		
+		rwLockJobAccount.readLock().lock();
+			
+			JobAccount jb = jobAccount.get(jobId);
+			if (jb == null) { rwLockJobAccount.readLock().unlock();
+				return new String[] {"Server", "InfoJob", "NoJob", "Failed"}; }
+			status = jb.status;
+			
+		rwLockJobAccount.readLock().unlock();
+		if (status.startsWith("__")) status = status.substring(2);
+		
+		return new String[] {"Servere", "InfoJob", status, "Success"};
+	}
+			
 
 }
 
